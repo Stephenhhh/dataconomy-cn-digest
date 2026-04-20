@@ -1,24 +1,33 @@
-"""Fetch and parse the Dataconomy CN RSS feed."""
+"""Fetch and parse the Dataconomy CN RSS feed via rss2json proxy.
+                                                                                                
+Why proxy: GitHub Actions' US IP ranges are blocked by Cloudflare on
+the origin site (cn.dataconomy.com). rss2json.com fetches the feed                              
+server-side from a friendlier IP and returns clean JSON.      
+                                                                                                
+Public API, no key required, 10000 requests/day free tier (we use 1/day).        
+Docs: https://rss2json.com/docs
+"""                   
 from __future__ import annotations
-
-import logging
-import time
+                                           
+import logging            
+import time                       
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
-
-import feedparser
+from typing import Any, Optional
+from urllib.parse import quote     
+               
 import requests
-from dateutil import parser as dateparser
+from dateutil import parser as dateparser                                                       
 
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger(__name__)                                                            
+                                                                                 
 FEED_URL = "https://cn.dataconomy.com/feed/"
+PROXY_API = "https://api.rss2json.com/v1/api.json"
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
-REQUEST_TIMEOUT = 20
+REQUEST_TIMEOUT = 30
 MAX_ATTEMPTS = 3
 
 
@@ -33,24 +42,36 @@ class FeedItem:
     categories: list[str] = field(default_factory=list)
 
 
-def fetch_feed_bytes(url: str = FEED_URL, timeout: int = REQUEST_TIMEOUT) -> bytes:
-    """GET the feed with a browser-like UA and exponential-backoff retry."""
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-    }
-    backoff = 1
+def fetch_feed_json(
+    feed_url: str = FEED_URL,
+    count: int = 10,
+    timeout: int = REQUEST_TIMEOUT,
+) -> dict[str, Any]:
+    """Fetch the feed via rss2json and return the decoded JSON payload."""
+    url = f"{PROXY_API}?rss_url={quote(feed_url, safe='')}&count={count}"
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    backoff = 2
     last_exc: Optional[Exception] = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             resp = requests.get(url, headers=headers, timeout=timeout)
-            if resp.status_code >= 500:
-                raise requests.HTTPError(f"{resp.status_code} server error")
             resp.raise_for_status()
-            logger.info("Fetched feed: %d bytes (attempt %d)", len(resp.content), attempt)
-            return resp.content
-        except (requests.ConnectionError, requests.Timeout, requests.HTTPError) as exc:
+            data = resp.json()
+            status = (data.get("status") or "").lower()
+            if status != "ok":
+                raise RuntimeError(
+                    f"rss2json returned non-ok status: {status!r}, "
+                    f"message={data.get('message')!r}"
+                )
+            items = data.get("items") or []
+            logger.info(
+                "Fetched feed via rss2json: %d items (attempt %d)",
+                len(items),
+                attempt,
+            )
+            return data
+        except (requests.ConnectionError, requests.Timeout, requests.HTTPError,
+                ValueError, RuntimeError) as exc:
             last_exc = exc
             logger.warning("Attempt %d failed: %s", attempt, exc)
             if attempt < MAX_ATTEMPTS:
@@ -61,50 +82,57 @@ def fetch_feed_bytes(url: str = FEED_URL, timeout: int = REQUEST_TIMEOUT) -> byt
 
 
 def _parse_pub_date(raw: Optional[str]) -> datetime:
+    """Parse rss2json's pubDate (e.g. '2026-04-20 10:35:17', assumed UTC)."""
     if not raw:
         return datetime.now(timezone.utc)
     try:
         dt = dateparser.parse(raw)
     except (ValueError, TypeError):
         return datetime.now(timezone.utc)
+    if dt is None:
+        return datetime.now(timezone.utc)
     if dt.tzinfo is None:
+        # rss2json returns naive strings; the source feed uses UTC (+0000).
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(timezone.utc)
 
 
-def _extract_summary(entry) -> str:
-    # Prefer <content:encoded>, fall back to <description>/<summary>.
-    content_list = entry.get("content") or []
-    if content_list:
-        value = content_list[0].get("value")
-        if value:
-            return value
-    return entry.get("summary") or entry.get("description") or ""
+def _pick_summary(item: dict[str, Any]) -> str:
+    """Prefer 'content' (full HTML), fall back to 'description'."""
+    content = item.get("content") or ""
+    if content and len(content) > 50:
+        return content
+    return item.get("description") or content or ""
 
 
-def _extract_categories(entry) -> list[str]:
-    tags = entry.get("tags") or []
-    cats = [t.get("term") for t in tags if t.get("term")]
-    return [c for c in cats if c]
+def _pick_categories(raw: Any) -> list[str]:
+    if not raw:
+        return []
+    if isinstance(raw, list):
+        return [str(c).strip() for c in raw if c and str(c).strip()]
+    if isinstance(raw, str):
+        return [raw.strip()] if raw.strip() else []
+    return []
 
 
-def parse_feed(raw: bytes) -> list[FeedItem]:
-    parsed = feedparser.parse(raw)
+def parse_feed(payload: dict[str, Any]) -> list[FeedItem]:
+    """Convert rss2json JSON payload to a list of FeedItem."""
     items: list[FeedItem] = []
-    for entry in parsed.entries:
-        link = entry.get("link") or ""
-        guid = entry.get("id") or link
+    for entry in payload.get("items") or []:
+        link = (entry.get("link") or "").strip()
+        guid = (entry.get("guid") or link).strip()
         if not guid:
-            continue  # skip malformed entries
+            continue
+        title = (entry.get("title") or "(无标题)").strip()
         items.append(
             FeedItem(
                 id=guid,
-                title=(entry.get("title") or "(无标题)").strip(),
+                title=title,
                 link=link,
-                published=_parse_pub_date(entry.get("published") or entry.get("updated")),
-                summary_html=_extract_summary(entry),
-                author=entry.get("author"),
-                categories=_extract_categories(entry),
+                published=_parse_pub_date(entry.get("pubDate")),
+                summary_html=_pick_summary(entry),
+                author=(entry.get("author") or None),
+                categories=_pick_categories(entry.get("categories")),
             )
         )
     logger.info("Parsed %d items", len(items))
@@ -112,7 +140,8 @@ def parse_feed(raw: bytes) -> list[FeedItem]:
 
 
 def get_latest_items(limit: int = 10) -> list[FeedItem]:
-    raw = fetch_feed_bytes()
-    items = parse_feed(raw)
+    payload = fetch_feed_json(count=limit)
+    items = parse_feed(payload)
     items.sort(key=lambda i: i.published, reverse=True)
     return items[:limit]
+
