@@ -1,0 +1,63 @@
+name: Daily Dataconomy CN Digest
+
+on:
+  schedule:
+    # UTC 02:23 ≈ Beijing 10:23; off-peak minute to dodge cron queue contention.
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (no email, no state write)"
+        type: boolean
+        default: false
+      force_send:
+        description: "Bypass dedup and send top N regardless"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-digest
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run digest
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.force_send }}" = "true" ]; then
+            ARGS="$ARGS --force-send"
+          fi
+          python -m src.main $ARGS
+
+      - name: Commit state.json
+        if: ${{ inputs.dry_run != true }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update state.json [skip ci]"
+          file_pattern: state.json
+          commit_user_name: "digest-bot"
+          commit_user_email: "digest-bot@users.noreply.github.com"
