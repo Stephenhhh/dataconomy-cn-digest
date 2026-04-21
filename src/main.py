@@ -100,12 +100,11 @@ def run(args: argparse.Namespace) -> int:
     # AI summary generation (graceful degradation)
     summary_result = summarizer.generate_summary(new_items)
     highlights = summary_result.highlights if summary_result else []
-    deks = summary_result.deks if summary_result else []
 
     beijing_date = datetime.now(ZoneInfo("Asia/Shanghai")).date()
     subject = email_render.build_subject(beijing_date, len(new_items))
-    html_body = email_render.render_html(new_items, beijing_date, highlights=highlights, deks=deks)
-    text_body = email_render.render_text(new_items, highlights=highlights, deks=deks)
+    html_body = email_render.render_html(new_items, beijing_date, highlights=highlights)
+    text_body = email_render.render_text(new_items, highlights=highlights)
     logger.info("Subject: %s", subject)
     logger.info("HTML length: %d chars", len(html_body))
 
@@ -117,10 +116,6 @@ def run(args: argparse.Namespace) -> int:
             logger.info("[dry-run] Highlights:")
             for h in highlights:
                 logger.info("  • %s", h)
-        if deks:
-            logger.info("[dry-run] Deks:")
-            for i, d in enumerate(deks):
-                logger.info("  %d: %s", i + 1, d)
         return 0
 
     smtp_user = _require_env("SMTP_USER")

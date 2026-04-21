@@ -26,7 +26,6 @@ _WHITESPACE_RE = re.compile(r"\s+")
 @dataclass
 class SummaryResult:
     highlights: list[str]
-    deks: list[str]
 
 
 def _strip_html(raw: str) -> str:
@@ -50,29 +49,25 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 
     article_block = "\n===\n".join(articles)
 
-    return f"""你是一位资深科技资讯编辑。以下是今日 {n} 条科技资讯，每条包含标题和全文。
-请完成以下两项任务：
+    return f"""你是一位资深科技资讯编辑，擅长用简洁自然的中文撰写新闻摘要。
 
-任务一：资讯速览
-从所有资讯中提炼 {num_highlights} 条最重要的核心要点，帮助读者在 30 秒内掌握今日关键信息。
+从以下 {n} 条资讯中提炼 {num_highlights} 条核心要点（资讯速览）。
+
 要求：
-- 每条要点 15-30 字，聚焦"发生了什么"和"为什么重要"，带有洞察和点评视角
-- 优先级：重大产品发布 > 行业趋势变化 > 安全/隐私事件 > 研究发现
-- 各要点覆盖不同领域，避免重复同一话题
-- 简洁中文，不用序号词
+- 每条 10-20 字，一句话直击要点，不要冗余修饰
+- 带有洞察视角，不是简单复述标题
+- 覆盖不同领域，不重复同一话题
+- 优先级：重大产品发布 > 行业趋势 > 安全事件 > 研究发现
 
-任务二：文章导语（Dek）
-为每篇资讯各写一句导语（Dek），用于展示在标题下方。
-要求：
-- 每条 Dek 20-40 字，重点在于概括文章的核心观点和结论，让读者一眼了解核心内容
-- 风格参考华尔街日报的文章副标题，信息密度高
-- 不要简单重复标题内容，而是补充标题未涵盖的关键信息
-- 严格按文章顺序输出，数量与输入文章数量一致
+语言规范（非常重要）：
+- 中英文之间必须加一个半角空格（如"Apple 发布""AI 模型""Claude Mythos 架构"）
+- 数字与中文之间也加空格（如"3 个月""100 万"）
+- 使用自然、平实、口语化的中文，避免翻译腔和生硬表述
+- 不编造原文中没有的信息
 
-请严格以如下 JSON 格式输出，不要输出任何其他内容：
+请严格以如下 JSON 格式输出：
 {{
-  "highlights": ["要点一", "要点二", ...],
-  "deks": ["文章1导语", "文章2导语", ...]
+  "highlights": ["要点一", "要点二"]
 }}
 
 资讯列表：
@@ -81,7 +76,7 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 ==="""
 
 
-def _parse_response(text: str, n_items: int) -> SummaryResult | None:
+def _parse_response(text: str) -> SummaryResult | None:
     """Parse LLM response text into SummaryResult."""
     cleaned = text.strip()
     # Strip markdown code block if present
@@ -95,27 +90,15 @@ def _parse_response(text: str, n_items: int) -> SummaryResult | None:
     data = json.loads(cleaned)
 
     highlights = data.get("highlights")
-    deks = data.get("deks")
 
     if not isinstance(highlights, list) or not highlights:
         logger.warning("Invalid highlights in LLM response")
         return None
 
-    if not isinstance(deks, list):
-        logger.warning("Invalid deks in LLM response")
-        return None
-
-    # Pad deks if shorter than expected
-    while len(deks) < n_items:
-        deks.append("")
-    # Trim if longer
-    deks = deks[:n_items]
-
     # Clean bullet prefixes from highlights
     highlights = [h.lstrip("•·- ").strip() for h in highlights]
-    deks = [d.strip() for d in deks]
 
-    return SummaryResult(highlights=highlights, deks=deks)
+    return SummaryResult(highlights=highlights)
 
 
 def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
@@ -156,13 +139,9 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
 
         logger.info("Gemini response length: %d chars", len(text))
         logger.info("Gemini raw response: %s", text[:500])
-        result = _parse_response(text, len(items))
+        result = _parse_response(text)
         if result:
-            logger.info(
-                "Generated %d highlights + %d deks",
-                len(result.highlights),
-                len(result.deks),
-            )
+            logger.info("Generated %d highlights", len(result.highlights))
         return result
 
     except Exception as exc:  # noqa: BLE001
