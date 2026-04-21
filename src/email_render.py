@@ -42,40 +42,38 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <tr><td align="center" style="padding:24px 12px;">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
         <tr><td style="padding:24px 28px 8px 28px;">
-          <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1a1a1a;">Dataconomy CN 每日资讯</h1>
-          <p style="margin:4px 0 0 0;font-size:13px;color:#999;">{{ beijing_date }} · {{ items|length }} 条</p>
+          <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
+          <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} · {{ items|length }} 条</p>
         </td></tr>
         {% if highlights %}
-        <tr><td style="padding:16px 28px 8px 28px;">
-          <div style="background:#f9f9f9;border-radius:8px;padding:18px 22px;">
-            <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
-              {% for h in highlights %}
-              <tr>
-                <td valign="top" style="width:32px;padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:600;color:#07C160;line-height:1.7;">{{ loop.index }}.</td>
-                <td valign="top" style="padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 4px;font-size:15px;line-height:1.7;color:#333;">{{ h }}</td>
-              </tr>
-              {% endfor %}
-            </table>
-          </div>
+        <tr><td style="padding:20px 28px 12px 28px;">
+          <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
+            {% for h in highlights %}
+            <tr>
+              <td valign="top" style="width:28px;padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:600;color:#86868B;line-height:1.7;">{{ loop.index }}.</td>
+              <td valign="top" style="padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 4px;font-size:15px;line-height:1.7;color:#1D1D1F;">{{ h }}</td>
+            </tr>
+            {% endfor %}
+          </table>
         </td></tr>
         {% endif %}
         {% for item in items %}
-        <tr><td style="padding:20px 28px;border-top:1px solid #eee;">
-          <a href="{{ item.link }}" style="color:#07C160;text-decoration:none;font-size:17px;font-weight:600;line-height:1.45;">{{ item.title }}</a>
-          <div style="margin:8px 0 10px 0;font-size:12px;color:#999;">
-            {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {{ item.categories|join('、') }}{% endif %}
+        <tr><td style="padding:32px 28px;border-top:1px solid #F0F0F0;">
+          <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
+          <div style="margin:0 0 14px 0;font-size:12px;color:#AEAEB2;">
+            {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {% for cat in item.categories %}<span style="display:inline-block;padding:2px 8px;background:#F4F5F7;border-radius:4px;font-size:11px;color:#636366;{% if not loop.last %}margin-right:4px;{% endif %}">{{ cat }}</span>{% endfor %}{% endif %}
           </div>
-          <div style="font-size:14px;line-height:1.65;color:#4d4d4d;">
+          <div style="font-size:14px;line-height:1.8;color:#636366;">
             {{ item.summary_html|safe }}
           </div>
-          <div style="margin-top:10px;">
-            <a href="{{ item.link }}" style="font-size:13px;color:#07C160;text-decoration:none;">阅读原文 →</a>
+          <div style="margin-top:16px;">
+            <a href="{{ item.link }}" style="font-size:14px;font-weight:500;color:#07C160;text-decoration:none;">阅读原文 →</a>
           </div>
         </td></tr>
         {% endfor %}
-        <tr><td style="padding:16px 28px 24px 28px;border-top:1px solid #eee;font-size:12px;color:#b3b3b3;">
-          来源：<a href="https://cn.dataconomy.com/" style="color:#b3b3b3;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
+        <tr><td style="padding:16px 28px 24px 28px;border-top:1px solid #F0F0F0;font-size:12px;color:#AEAEB2;">
+          来源：<a href="https://cn.dataconomy.com/" style="color:#AEAEB2;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
         </td></tr>
       </table>
     </td></tr>
@@ -85,8 +83,56 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
+_MAX_CHINESE_CHARS = 350
+
+
+def _truncate_html(html_str: str, max_chars: int = _MAX_CHINESE_CHARS) -> str:
+    """Truncate HTML content to approximately max_chars of visible Chinese text.
+
+    Strips tags to count characters, then truncates the original HTML at the
+    corresponding point, closing any open tags and appending an ellipsis.
+    """
+    # Get plain text (no whitespace) for counting
+    plain = _TAG_RE.sub("", html_str)
+    plain = re.sub(r"\s+", "", plain)
+    if len(plain) <= max_chars:
+        return html_str
+
+    # Walk through HTML, counting visible chars
+    count = 0
+    i = 0
+    while i < len(html_str) and count < max_chars:
+        if html_str[i] == "<":
+            # Skip entire tag
+            end = html_str.find(">", i)
+            if end == -1:
+                break
+            i = end + 1
+        elif html_str[i] in (" ", "\n", "\r", "\t"):
+            i += 1
+        else:
+            count += 1
+            i += 1
+
+    # Find a reasonable cut point (end of current paragraph or sentence)
+    # Try to cut at </p> within the next 100 chars
+    cut_search = html_str[i : i + 200]
+    p_end = cut_search.find("</p>")
+    if p_end != -1 and p_end < 150:
+        i = i + p_end + 4  # include the </p>
+    else:
+        # Cut at current position, try not to break a tag
+        if "<" in html_str[max(0, i - 10) : i]:
+            tag_start = html_str.rfind("<", 0, i)
+            if tag_start > 0:
+                i = tag_start
+
+    truncated = html_str[:i].rstrip()
+    return truncated + '<p style="color:#999;font-size:13px;">……</p>'
+
+
 def _sanitize_summary(raw: str) -> str:
-    """Remove script/style blocks and trailing junk; make images responsive."""
+    """Remove script/style blocks and trailing junk; style images, paragraphs, blockquotes; truncate."""
     if not raw:
         return ""
     cleaned = _SCRIPT_STYLE_RE.sub("", raw)
@@ -94,13 +140,29 @@ def _sanitize_summary(raw: str) -> str:
     cleaned = _TRAILING_JUNK_RE.sub("", cleaned)
     # Remove "精选图片来源" and everything after (sometimes without <hr>)
     cleaned = _FEATURED_IMAGE_RE.sub("", cleaned)
-    # Make images responsive
+    # Style images: 8px rounded corners, border, margin, responsive
     cleaned = re.sub(
         r"<img\b",
-        '<img style="max-width:100%;height:auto;border-radius:4px;"',
+        '<img style="max-width:100%;height:auto;border-radius:8px;border:1px solid #EDEDED;margin:14px 0;display:block;"',
         cleaned,
         flags=re.IGNORECASE,
     )
+    # Style paragraphs: add margin-bottom for breathing room
+    cleaned = re.sub(
+        r"<p\b([^>]*)>",
+        r'<p style="margin:0 0 14px 0;"\1>',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    # Style blockquotes: grey left border + light background
+    cleaned = re.sub(
+        r"<blockquote\b[^>]*>",
+        '<blockquote style="margin:14px 0;padding:14px 18px;border-left:3px solid #E5E5EA;background:#FAFAFA;border-radius:0 8px 8px 0;">',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    # Truncate if too long
+    cleaned = _truncate_html(cleaned)
     return cleaned.rstrip()
 
 

@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Dry run (no email, no state write)"
+        description: "仅测试，不发邮件、不更新状态"
         type: boolean
         default: false
       force_send:
-        description: "Bypass dedup and send top N regardless"
+        description: "忽略去重，强制发送最新 N 条"
         type: boolean
         default: false
 

@@ -84,7 +84,7 @@ def run(args: argparse.Namespace) -> int:
         logger.info("Categories in this batch: %s", ", ".join(sorted(all_cats)))
 
     # Sort items by category priority
-    _CATEGORY_ORDER = ["人工智能", "Tech", "研究", "消息", "行业", "网络安全"]
+    _CATEGORY_ORDER = ["Tech", "研究", "人工智能", "消息", "行业", "网络安全"]
 
     def _sort_key(item: feed.FeedItem) -> int:
         """Return the best (lowest) priority among the item's categories."""
