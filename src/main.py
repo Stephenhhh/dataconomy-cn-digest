@@ -155,7 +155,7 @@ def run(args: argparse.Namespace) -> int:
     smtp_user = _require_env("SMTP_USER")
     smtp_pass = _require_env("SMTP_PASS")
     mail_to = _require_env("MAIL_TO")
-    cc_list = _load_cc_list()
+    bcc_list = _load_cc_list()
 
     mailer.send_email(
         subject=subject,
@@ -164,7 +164,7 @@ def run(args: argparse.Namespace) -> int:
         smtp_user=smtp_user,
         smtp_pass=smtp_pass,
         mail_to=mail_to,
-        cc_list=cc_list,
+        bcc_list=bcc_list,
     )
 
     if not args.force_send:

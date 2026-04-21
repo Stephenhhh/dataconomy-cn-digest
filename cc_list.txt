@@ -1,4 +1,8 @@
-# Dataconomy CN 日报抄送列表
-# 每行一个邮箱地址，空行和 # 开头的注释行会被忽略
+# Dataconomy CN 日报密送列表（BCC）
+# 每行一个邮箱地址，收件人之间互不可见
+# 空行和 # 开头的注释行会被忽略
 scofieldmao@tencent.com
 2772184345@qq.com
+stinejiang@tencent.com
+sophiaqin@tencent.com
+tracixu@tencent.com
