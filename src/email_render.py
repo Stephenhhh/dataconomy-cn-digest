@@ -39,45 +39,47 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ subject }}</title>
 </head>
-<body style="margin:0;padding:0;background:#f2f2f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f2f2f2;">
-    <tr><td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-        <tr><td style="padding:24px 28px 8px 28px;">
-          <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
-          <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
-        </td></tr>
-        {% if highlights %}
-        <tr><td style="padding:20px 28px 12px 28px;">
-          <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
-            {% for h in highlights %}
-            <tr>
-              <td valign="top" style="width:20px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
-              <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
-            </tr>
-            {% endfor %}
-          </table>
-        </td></tr>
-        {% endif %}
-        {% for item in items %}
-        <tr><td style="padding:32px 28px;border-top:1px solid #F0F0F0;">
-          <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
-          <div style="margin:0 0 14px 0;font-size:12px;color:#AEAEB2;">
-            {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {% for cat in item.categories %}<span style="display:inline-block;padding:2px 8px;background:#FFFFFF;border-radius:4px;font-size:11px;color:#636366;{% if not loop.last %}margin-right:4px;{% endif %}">{{ cat }}</span>{% endfor %}{% endif %}
-          </div>
-          <div style="font-size:14px;line-height:1.8;color:#636366;">
-            {{ item.summary_html|safe }}
-          </div>
-          <div style="margin-top:16px;">
-            <a href="{{ item.link }}" style="font-size:14px;font-weight:500;color:#07C160;text-decoration:none;">阅读原文 →</a>
-          </div>
-        </td></tr>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td style="padding:24px 28px 8px 28px;">
+      <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
+      <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
+    </td></tr>
+    {% if highlights %}
+    <tr><td style="padding:20px 28px 0 28px;">
+      <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
+        {% for h in highlights %}
+        <tr>
+          <td valign="top" style="width:20px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
+          <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
+        </tr>
         {% endfor %}
-        <tr><td style="padding:16px 28px 24px 28px;border-top:1px solid #F0F0F0;font-size:12px;color:#AEAEB2;">
-          来源：<a href="https://cn.dataconomy.com/" style="color:#AEAEB2;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
-        </td></tr>
       </table>
+    </td></tr>
+    {% endif %}
+    {% for item in items %}
+    <tr><td style="padding:0 28px;">
+      <div style="border-top:1px solid #F0F0F0;margin:32px 0;"></div>
+    </td></tr>
+    <tr><td style="padding:0 28px;">
+      <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
+      <div style="margin:0 0 14px 0;font-size:12px;color:#AEAEB2;">
+        {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {% for cat in item.categories %}<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;color:#636366;{% if not loop.last %}margin-right:4px;{% endif %}">{{ cat }}</span>{% endfor %}{% endif %}
+      </div>
+      <div style="font-size:14px;line-height:1.8;color:#636366;">
+        {{ item.summary_html|safe }}
+      </div>
+      <div style="margin-top:16px;">
+        <a href="{{ item.link }}" style="font-size:14px;font-weight:500;color:#07C160;text-decoration:none;">阅读原文 →</a>
+      </div>
+    </td></tr>
+    {% endfor %}
+    <tr><td style="padding:0 28px;">
+      <div style="border-top:1px solid #F0F0F0;margin:32px 0 0 0;"></div>
+    </td></tr>
+    <tr><td style="padding:0 28px 24px 28px;font-size:12px;color:#AEAEB2;">
+      来源：<a href="https://cn.dataconomy.com/" style="color:#AEAEB2;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
     </td></tr>
   </table>
 </body>
