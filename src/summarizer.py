@@ -46,7 +46,8 @@ def _build_prompt(items: list["FeedItem"]) -> str:
     articles = []
     for i, it in enumerate(items, 1):
         plaintext = _strip_html(it.summary_html)
-        articles.append(f"第{i}篇\n标题：{it.title}\n全文：{plaintext}")
+        cats = "、".join(it.categories) if it.categories else "未分类"
+        articles.append(f"第{i}篇\n分类：{cats}\n标题：{it.title}\n全文：{plaintext}")
 
     article_block = "\n===\n".join(articles)
 
@@ -58,7 +59,6 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 - 每条 10-20 字，一句话直击要点，不要冗余修饰
 - 带有洞察视角，不是简单复述标题
 - 覆盖不同领域，不重复同一话题
-- 要点排序优先级：Tech > 研究 > 人工智能 > 消息 > 行业 > 网络安全
 - 每条要点需标注来源文章的编号（从 1 开始）
 
 语言规范（非常重要）：

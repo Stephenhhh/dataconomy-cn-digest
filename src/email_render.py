@@ -30,6 +30,8 @@ _FEATURED_IMAGE_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
+_WEEKDAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -43,7 +45,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
         <tr><td style="padding:24px 28px 8px 28px;">
           <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
-          <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} · {{ items|length }} 条</p>
+          <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
         </td></tr>
         {% if highlights %}
         <tr><td style="padding:20px 28px 12px 28px;">
@@ -51,8 +53,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
             {% for h in highlights %}
             <tr>
-              <td valign="top" style="width:28px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
-              <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 4px;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
+              <td valign="top" style="width:20px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
+              <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
             </tr>
             {% endfor %}
           </table>
@@ -202,6 +204,7 @@ def render_html(
     return template.render(
         subject=subject,
         beijing_date=beijing_date.isoformat(),
+        beijing_weekday=_WEEKDAYS[beijing_date.weekday()],
         items=prepared,
         highlights=highlights or [],
         generated_at=now_beijing,

@@ -101,14 +101,29 @@ def run(args: argparse.Namespace) -> int:
     summary_result = summarizer.generate_summary(new_items)
     highlights = summary_result.highlights if summary_result else []
 
-    # Reorder items: highlighted articles first (in highlight order), then rest by category
+    # Sort highlights by category priority of their source articles, then reorder items
     if summary_result and summary_result.highlight_refs:
         refs = summary_result.highlight_refs
-        # Convert 1-based refs to 0-based indices, filter valid ones
-        highlighted_indices = []
-        for r in refs:
+
+        # Build (priority, original_index) for each highlight and sort
+        highlight_pairs = []  # (category_priority, highlight_text, article_0based_index)
+        for i, (h, r) in enumerate(zip(highlights, refs)):
             idx = r - 1  # 1-based to 0-based
-            if 0 <= idx < len(new_items) and idx not in highlighted_indices:
+            if 0 <= idx < len(new_items):
+                priority = _sort_key(new_items[idx])
+            else:
+                priority = len(_CATEGORY_ORDER)
+                idx = -1
+            highlight_pairs.append((priority, h, idx))
+
+        # Sort highlights by category priority
+        highlight_pairs.sort(key=lambda x: x[0])
+        highlights = [h for _, h, _ in highlight_pairs]
+
+        # Reorder items: highlighted articles first (in sorted highlight order), then rest
+        highlighted_indices = []
+        for _, _, idx in highlight_pairs:
+            if idx >= 0 and idx not in highlighted_indices:
                 highlighted_indices.append(idx)
 
         highlighted_items = [new_items[i] for i in highlighted_indices]
