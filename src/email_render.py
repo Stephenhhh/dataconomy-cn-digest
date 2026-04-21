@@ -41,6 +41,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Helvetica,Arial,sans-serif;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td align="center">
+      <table role="presentation" width="680" cellspacing="0" cellpadding="0" border="0" style="max-width:680px;">
     <tr><td style="padding:24px 28px 8px 28px;">
       <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
       <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
@@ -80,6 +82,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </td></tr>
     <tr><td style="padding:0 28px 24px 28px;font-size:12px;color:#AEAEB2;">
       来源：<a href="https://cn.dataconomy.com/" style="color:#AEAEB2;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
+    </td></tr>
+      </table>
     </td></tr>
   </table>
 </body>
@@ -165,6 +169,8 @@ def _sanitize_summary(raw: str) -> str:
         cleaned,
         flags=re.IGNORECASE,
     )
+    # Strip hyperlinks in body text: keep link text, remove <a> tags
+    cleaned = re.sub(r"<a\b[^>]*>(.*?)</a>", r"\1", cleaned, flags=re.IGNORECASE | re.DOTALL)
     # Truncate if too long
     cleaned = _truncate_html(cleaned)
     return cleaned.rstrip()
