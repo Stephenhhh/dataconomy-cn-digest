@@ -17,6 +17,19 @@ _SCRIPT_STYLE_RE = re.compile(
 _TAG_RE = re.compile(r"<[^>]+>")
 _WHITESPACE_RE = re.compile(r"\s+")
 
+# Clean trailing junk from Dataconomy CN articles:
+# - "<小时>" (mistranslated <hr>)
+# - "精选图片来源" / "Featured image credit" links
+_TRAILING_JUNK_RE = re.compile(
+    r"(?:<小时>|<hr\b[^>]*>)"
+    r".*$",
+    re.IGNORECASE | re.DOTALL,
+)
+_FEATURED_IMAGE_RE = re.compile(
+    r"\s*精选图片来源.*$",
+    re.IGNORECASE | re.DOTALL,
+)
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -32,9 +45,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <h1 style="margin:0;font-size:20px;line-height:1.4;color:#111;">Dataconomy CN 每日资讯</h1>
           <p style="margin:4px 0 0 0;font-size:13px;color:#777;">{{ beijing_date }} · {{ items|length }} 条</p>
         </td></tr>
+        {% if highlights %}
+        <tr><td style="padding:16px 28px 8px 28px;border-top:1px solid #eee;">
+          <div style="background:#f0f7ff;border-radius:6px;padding:14px 18px;">
+            <div style="font-size:13px;font-weight:600;color:#0b66ff;margin-bottom:8px;">资讯速览</div>
+            {% for h in highlights %}
+            <div style="font-size:14px;line-height:1.6;color:#333;{% if not loop.last %}margin-bottom:6px;{% endif %}">• {{ h }}</div>
+            {% endfor %}
+          </div>
+        </td></tr>
+        {% endif %}
         {% for item in items %}
         <tr><td style="padding:20px 28px;border-top:1px solid #eee;">
           <a href="{{ item.link }}" style="color:#0b66ff;text-decoration:none;font-size:17px;font-weight:600;line-height:1.45;">{{ item.title }}</a>
+          {% if item.dek %}
+          <div style="margin:4px 0 0 0;font-size:14px;line-height:1.5;color:#555;">{{ item.dek }}</div>
+          {% endif %}
           <div style="margin:6px 0 10px 0;font-size:12px;color:#888;">
             {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {{ item.categories|join('、') }}{% endif %}
           </div>
@@ -58,22 +84,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 
 def _sanitize_summary(raw: str) -> str:
-    """Remove script/style blocks; let Gmail sandbox the rest.
-
-    Also constrains images to be responsive via a wrapping style tweak —
-    we do it with a simple regex on <img> tags.
-    """
+    """Remove script/style blocks and trailing junk; make images responsive."""
     if not raw:
         return ""
     cleaned = _SCRIPT_STYLE_RE.sub("", raw)
-    # Make images responsive.
+    # Remove trailing junk: <小时>, <hr>, and everything after
+    cleaned = _TRAILING_JUNK_RE.sub("", cleaned)
+    # Remove "精选图片来源" and everything after (sometimes without <hr>)
+    cleaned = _FEATURED_IMAGE_RE.sub("", cleaned)
+    # Make images responsive
     cleaned = re.sub(
         r"<img\b",
         '<img style="max-width:100%;height:auto;border-radius:4px;"',
         cleaned,
         flags=re.IGNORECASE,
     )
-    return cleaned
+    return cleaned.rstrip()
 
 
 def _beijing_str(dt: datetime) -> str:
@@ -87,11 +113,17 @@ def build_subject(beijing_date: date, n_items: int) -> str:
     return f"Dataconomy {short_date} 日报 · {n_items} 条"
 
 
-def render_html(items: list["FeedItem"], beijing_date: date) -> str:
+def render_html(
+    items: list["FeedItem"],
+    beijing_date: date,
+    highlights: list[str] | None = None,
+    deks: list[str] | None = None,
+) -> str:
     from zoneinfo import ZoneInfo
 
     env = Environment(autoescape=select_autoescape(["html", "xml"]))
     template = env.from_string(HTML_TEMPLATE)
+    deks = deks or []
     prepared = [
         {
             "title": it.title,
@@ -100,8 +132,9 @@ def render_html(items: list["FeedItem"], beijing_date: date) -> str:
             "categories": it.categories,
             "pub_beijing": _beijing_str(it.published),
             "summary_html": _sanitize_summary(it.summary_html),
+            "dek": deks[i] if i < len(deks) else "",
         }
-        for it in items
+        for i, it in enumerate(items)
     ]
     subject = build_subject(beijing_date, len(items))
     now_beijing = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y-%m-%d %H:%M %Z")
@@ -109,18 +142,36 @@ def render_html(items: list["FeedItem"], beijing_date: date) -> str:
         subject=subject,
         beijing_date=beijing_date.isoformat(),
         items=prepared,
+        highlights=highlights or [],
         generated_at=now_beijing,
     )
 
 
-def render_text(items: list["FeedItem"]) -> str:
+def render_text(
+    items: list["FeedItem"],
+    highlights: list[str] | None = None,
+    deks: list[str] | None = None,
+) -> str:
     lines: list[str] = ["Dataconomy CN 每日资讯", ""]
+
+    if highlights:
+        lines.append("资讯速览")
+        for h in highlights:
+            lines.append(f"• {h}")
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+
+    deks = deks or []
     for i, it in enumerate(items, 1):
         summary_text = _TAG_RE.sub(" ", it.summary_html or "")
         summary_text = html.unescape(_WHITESPACE_RE.sub(" ", summary_text)).strip()
         if len(summary_text) > 200:
             summary_text = summary_text[:200].rstrip() + "…"
         lines.append(f"{i}. {it.title}")
+        dek = deks[i - 1] if (i - 1) < len(deks) else ""
+        if dek:
+            lines.append(f"   >> {dek}")
         lines.append(f"   {it.link}")
         lines.append(f"   {_beijing_str(it.published)}")
         if summary_text:

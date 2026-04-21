@@ -1,0 +1,5 @@
+# Dataconomy CN 日报抄送列表
+# 每行一个邮箱地址，空行和 # 开头的注释行会被忽略
+# 示例：
+# alice@example.com
+# bob@example.com
