@@ -83,7 +83,8 @@ def _beijing_str(dt: datetime) -> str:
 
 
 def build_subject(beijing_date: date, n_items: int) -> str:
-    return f"Dataconomy CN · {beijing_date.isoformat()} · {n_items}条"
+    short_date = beijing_date.strftime("%m-%d")
+    return f"Dataconomy {short_date} 日报 · {n_items} 条"
 
 
 def render_html(items: list["FeedItem"], beijing_date: date) -> str:
