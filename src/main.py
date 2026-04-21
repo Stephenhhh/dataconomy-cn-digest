@@ -101,6 +101,25 @@ def run(args: argparse.Namespace) -> int:
     summary_result = summarizer.generate_summary(new_items)
     highlights = summary_result.highlights if summary_result else []
 
+    # Reorder items: highlighted articles first (in highlight order), then rest by category
+    if summary_result and summary_result.highlight_refs:
+        refs = summary_result.highlight_refs
+        # Convert 1-based refs to 0-based indices, filter valid ones
+        highlighted_indices = []
+        for r in refs:
+            idx = r - 1  # 1-based to 0-based
+            if 0 <= idx < len(new_items) and idx not in highlighted_indices:
+                highlighted_indices.append(idx)
+
+        highlighted_items = [new_items[i] for i in highlighted_indices]
+        rest_items = [it for i, it in enumerate(new_items) if i not in highlighted_indices]
+        new_items = highlighted_items + rest_items
+        logger.info(
+            "Reordered: %d highlighted first, %d rest",
+            len(highlighted_items),
+            len(rest_items),
+        )
+
     beijing_date = datetime.now(ZoneInfo("Asia/Shanghai")).date()
     subject = email_render.build_subject(beijing_date, len(new_items))
     html_body = email_render.render_html(new_items, beijing_date, highlights=highlights)

@@ -26,6 +26,7 @@ _WHITESPACE_RE = re.compile(r"\s+")
 @dataclass
 class SummaryResult:
     highlights: list[str]
+    highlight_refs: list[int]  # 1-based article indices corresponding to each highlight
 
 
 def _strip_html(raw: str) -> str:
@@ -57,7 +58,8 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 - 每条 10-20 字，一句话直击要点，不要冗余修饰
 - 带有洞察视角，不是简单复述标题
 - 覆盖不同领域，不重复同一话题
-- 优先级：重大产品发布 > 行业趋势 > 安全事件 > 研究发现
+- 要点排序优先级：Tech > 研究 > 人工智能 > 消息 > 行业 > 网络安全
+- 每条要点需标注来源文章的编号（从 1 开始）
 
 语言规范（非常重要）：
 - 中英文之间必须加一个半角空格（如"Apple 发布""AI 模型""Claude Mythos 架构"）
@@ -67,8 +69,11 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 
 请严格以如下 JSON 格式输出：
 {{
-  "highlights": ["要点一", "要点二"]
+  "highlights": ["要点一", "要点二"],
+  "highlight_refs": [3, 1]
 }}
+
+其中 highlight_refs 是每条要点对应的文章编号（与输入列表中"第N篇"的 N 一致），顺序与 highlights 一一对应。
 
 资讯列表：
 ===
@@ -98,7 +103,20 @@ def _parse_response(text: str) -> SummaryResult | None:
     # Clean bullet prefixes from highlights
     highlights = [h.lstrip("•·- ").strip() for h in highlights]
 
-    return SummaryResult(highlights=highlights)
+    # Parse highlight_refs (1-based article indices)
+    raw_refs = data.get("highlight_refs", [])
+    highlight_refs: list[int] = []
+    if isinstance(raw_refs, list):
+        for r in raw_refs:
+            try:
+                highlight_refs.append(int(r))
+            except (ValueError, TypeError):
+                highlight_refs.append(0)
+    # Pad if shorter than highlights
+    while len(highlight_refs) < len(highlights):
+        highlight_refs.append(0)
+
+    return SummaryResult(highlights=highlights, highlight_refs=highlight_refs)
 
 
 def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:

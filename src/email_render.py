@@ -51,8 +51,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
             {% for h in highlights %}
             <tr>
-              <td valign="top" style="width:28px;padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.7;">{{ loop.index }}.</td>
-              <td valign="top" style="padding:{% if not loop.first %}12px{% else %}0px{% endif %} 0 0 4px;font-size:15px;line-height:1.7;color:#1D1D1F;">{{ h }}</td>
+              <td valign="top" style="width:28px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
+              <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 4px;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
             </tr>
             {% endfor %}
           </table>
