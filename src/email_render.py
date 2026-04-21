@@ -54,7 +54,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         {% for h in highlights %}
         <tr>
           <td valign="top" style="width:20px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
-          <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#1D1D1F;">{{ h }}</td>
+          <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#424245;">{{ h }}</td>
         </tr>
         {% endfor %}
       </table>
@@ -67,9 +67,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <tr><td style="padding:0 28px;">
       <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
       <div style="margin:0 0 14px 0;font-size:12px;color:#AEAEB2;">
-        {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {% for cat in item.categories %}<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;color:#636366;{% if not loop.last %}margin-right:4px;{% endif %}">{{ cat }}</span>{% endfor %}{% endif %}
+        {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {{ item.categories|join(' · ') }}{% endif %}
       </div>
-      <div style="font-size:14px;line-height:1.8;color:#636366;">
+      <div style="font-size:14px;line-height:1.8;color:#424245;">
         {{ item.summary_html|safe }}
       </div>
       <div style="margin-top:16px;">
