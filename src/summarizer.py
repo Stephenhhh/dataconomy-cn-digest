@@ -131,6 +131,7 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
 
     try:
         from google import genai
+        from google.genai import types
 
         client = genai.Client(api_key=api_key)
 
@@ -140,10 +141,12 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
         response = client.models.generate_content(
             model=MODEL,
             contents=prompt,
-            config={
-                "temperature": 0.3,
-                "max_output_tokens": 2048,
-            },
+            config=types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=8192,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                response_mime_type="application/json",
+            ),
         )
 
         text = response.text
@@ -152,6 +155,7 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
             return None
 
         logger.info("Gemini response length: %d chars", len(text))
+        logger.info("Gemini raw response: %s", text[:500])
         result = _parse_response(text, len(items))
         if result:
             logger.info(

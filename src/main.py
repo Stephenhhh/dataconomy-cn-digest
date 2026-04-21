@@ -83,6 +83,20 @@ def run(args: argparse.Namespace) -> int:
     if all_cats:
         logger.info("Categories in this batch: %s", ", ".join(sorted(all_cats)))
 
+    # Sort items by category priority
+    _CATEGORY_ORDER = ["人工智能", "Tech", "研究", "消息", "行业", "网络安全"]
+
+    def _sort_key(item: feed.FeedItem) -> int:
+        """Return the best (lowest) priority among the item's categories."""
+        best = len(_CATEGORY_ORDER)  # fallback: after all known categories
+        for cat in item.categories:
+            if cat in _CATEGORY_ORDER:
+                best = min(best, _CATEGORY_ORDER.index(cat))
+        return best
+
+    new_items = sorted(new_items, key=_sort_key)
+    logger.info("Sorted order: %s", " | ".join(it.title[:20] for it in new_items))
+
     # AI summary generation (graceful degradation)
     summary_result = summarizer.generate_summary(new_items)
     highlights = summary_result.highlights if summary_result else []

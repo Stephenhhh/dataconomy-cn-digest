@@ -110,7 +110,7 @@ def _beijing_str(dt: datetime) -> str:
 
 def build_subject(beijing_date: date, n_items: int) -> str:
     short_date = beijing_date.strftime("%m-%d")
-    return f"Dataconomy {short_date} 日报 · {n_items} 条"
+    return f"🚀Dataconomy 早报：{n_items} 条看点"
 
 
 def render_html(
