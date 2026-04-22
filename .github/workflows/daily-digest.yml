@@ -2,7 +2,7 @@ name: Daily Dataconomy CN Digest
 
 on:
   schedule:
-    # UTC 02:23 ≈ Beijing 10:23; off-peak minute to dodge cron queue contention.
+    # UTC 02:23 ≈ Beijing 10:23. Synced: 2026-04-22
     - cron: "23 2 * * *"
   workflow_dispatch:
     inputs:
