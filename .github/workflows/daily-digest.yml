@@ -1,9 +1,10 @@
 name: Daily Dataconomy CN Digest
 
 on:
-  schedule:
-    # UTC 02:23 ≈ Beijing 10:23. Synced: 2026-04-22
-    - cron: "23 2 * * *"
+  # schedule 已迁移至 cron-job.org 外部精准触发（±1秒）
+  # GitHub 原生 cron 延迟可达数小时，故弃用
+  # schedule:
+  #   - cron: "23 2 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
