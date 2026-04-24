@@ -100,8 +100,11 @@ def _parse_response(text: str) -> SummaryResult | None:
         logger.warning("Invalid highlights in LLM response")
         return None
 
-    # Clean bullet prefixes from highlights
-    highlights = [h.lstrip("•·- ").strip() for h in highlights]
+    # Clean bullet prefixes and trailing reference numbers like (1), （3）
+    highlights = [
+        re.sub(r"\s*[（(]\d+[)）]\s*$", "", h.lstrip("•·- ")).strip()
+        for h in highlights
+    ]
 
     # Parse highlight_refs (1-based article indices)
     raw_refs = data.get("highlight_refs", [])
