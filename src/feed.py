@@ -1,10 +1,11 @@
 """Fetch and parse the Dataconomy CN posts via WordPress REST API.
 
-Why REST API instead of RSS:
-- The RSS feed (/feed/) is blocked by Cloudflare's JS challenge for
-  automated requests (both from GitHub Actions US IPs and our Worker).
-- The WP REST API (/wp-json/wp/v2/posts) is NOT behind the challenge
-  and returns clean JSON reliably from any IP.
+Strategy:
+- Primary: Direct WP REST API call (works from most IPs)
+- Fallback: Cloudflare Worker proxy (for GitHub Actions US IPs blocked by WAF)
+
+The Worker proxies requests to cn.dataconomy.com from Cloudflare's edge
+network, which is trusted by the origin's own Cloudflare WAF.
 """
 from __future__ import annotations
 
@@ -19,10 +20,14 @@ from dateutil import parser as dateparser
 
 logger = logging.getLogger(__name__)
 
-# WordPress REST API endpoint (not blocked by Cloudflare challenge)
+# Direct WP REST API (works from non-blocked IPs)
 API_URL = "https://cn.dataconomy.com/wp-json/wp/v2/posts"
-# Category endpoint for resolving IDs to names
 CATEGORY_API_URL = "https://cn.dataconomy.com/wp-json/wp/v2/categories"
+
+# Cloudflare Worker proxy (fallback for blocked IPs like GitHub Actions)
+# Worker passes through requests to cn.dataconomy.com WP API
+WORKER_API_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/wp-json/wp/v2/posts"
+WORKER_CATEGORY_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/wp-json/wp/v2/categories"
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -43,25 +48,50 @@ class FeedItem:
     categories: list[str] = field(default_factory=list)
 
 
-def _request_with_retry(url: str, params: dict | None = None) -> requests.Response:
-    """GET with retry and exponential backoff."""
+def _request_single(url: str, params: dict | None = None) -> requests.Response:
+    """Single GET request with timeout."""
     headers = {
         "User-Agent": USER_AGENT,
         "Accept": "application/json",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     }
+    resp = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+    if resp.status_code >= 500:
+        raise requests.HTTPError(f"{resp.status_code} server error")
+    resp.raise_for_status()
+    return resp
+
+
+def _request_with_fallback(
+    primary_url: str,
+    fallback_url: str,
+    params: dict | None = None,
+) -> requests.Response:
+    """Try primary URL first; on 403/failure, fall back to Worker proxy."""
+    # Try primary (direct)
+    try:
+        resp = _request_single(primary_url, params)
+        logger.info("Direct request succeeded: %s", primary_url)
+        return resp
+    except requests.HTTPError as exc:
+        if "403" in str(exc):
+            logger.warning("Direct 403, falling back to Worker proxy: %s", exc)
+        else:
+            logger.warning("Direct request failed: %s", exc)
+    except (requests.ConnectionError, requests.Timeout) as exc:
+        logger.warning("Direct request failed: %s", exc)
+
+    # Fallback to Worker proxy with retries
     backoff = 2
     last_exc: Optional[Exception] = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            resp = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
-            if resp.status_code >= 500:
-                raise requests.HTTPError(f"{resp.status_code} server error")
-            resp.raise_for_status()
+            resp = _request_single(fallback_url, params)
+            logger.info("Worker proxy succeeded (attempt %d): %s", attempt, fallback_url)
             return resp
         except (requests.ConnectionError, requests.Timeout, requests.HTTPError) as exc:
             last_exc = exc
-            logger.warning("Attempt %d failed: %s", attempt, exc)
+            logger.warning("Worker attempt %d failed: %s", attempt, exc)
             if attempt < MAX_ATTEMPTS:
                 time.sleep(backoff)
                 backoff *= 3
@@ -70,13 +100,14 @@ def _request_with_retry(url: str, params: dict | None = None) -> requests.Respon
 
 
 def _fetch_category_names(cat_ids: list[int]) -> dict[int, str]:
-    """Resolve category IDs to names via WP API."""
+    """Resolve category IDs to names via WP API (with Worker fallback)."""
     if not cat_ids:
         return {}
     unique_ids = list(set(cat_ids))
     try:
-        resp = _request_with_retry(
+        resp = _request_with_fallback(
             CATEGORY_API_URL,
+            WORKER_CATEGORY_URL,
             params={"include": ",".join(str(i) for i in unique_ids), "per_page": 100},
         )
         data = resp.json()
@@ -103,7 +134,7 @@ def _parse_pub_date(raw: Optional[str]) -> datetime:
 
 def get_latest_items(limit: int = 10) -> list[FeedItem]:
     """Fetch latest posts from WP REST API and return as FeedItems."""
-    resp = _request_with_retry(API_URL, params={"per_page": limit})
+    resp = _request_with_fallback(API_URL, WORKER_API_URL, params={"per_page": limit})
     posts = resp.json()
     logger.info("Fetched %d posts from WP REST API (%d bytes)", len(posts), len(resp.content))
 
