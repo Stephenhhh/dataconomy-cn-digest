@@ -81,6 +81,25 @@ def _build_prompt(items: list["FeedItem"]) -> str:
 ==="""
 
 
+def _fix_json(text: str) -> str:
+    """Attempt to fix common JSON issues from LLM output."""
+    # Remove trailing commas before ] or }
+    # e.g., "item",] -> "item"]
+    text = re.sub(r",\s*([}\]])", r"\1", text)
+    # Fix Chinese punctuation used as JSON delimiters
+    # e.g., "value"， -> "value",
+    text = re.sub(r'"\s*，\s*"', '", "', text)
+    text = re.sub(r'"\s*，\s*\]', '"]', text)
+    text = re.sub(r'"\s*，\s*}', '"}', text)
+    # Fix strings ending with Chinese period + Chinese comma: 。"，  -> 。",
+    text = re.sub(r'。"\s*，', '。",', text)
+    # Remove any trailing Chinese commas/periods outside of string values that break JSON
+    # Pattern: content"，\n -> content",\n
+    text = re.sub(r'"，\s*\n', '",\n', text)
+    text = re.sub(r'"，\s*$', '",', text, flags=re.MULTILINE)
+    return text
+
+
 def _parse_response(text: str) -> SummaryResult | None:
     """Parse LLM response text into SummaryResult."""
     cleaned = text.strip()
@@ -92,7 +111,13 @@ def _parse_response(text: str) -> SummaryResult | None:
             cleaned = cleaned[:-3]
         cleaned = cleaned.strip()
 
-    data = json.loads(cleaned)
+    # Try standard parse first, then fix common LLM JSON issues
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        logger.info("Standard JSON parse failed, attempting fix...")
+        fixed = _fix_json(cleaned)
+        data = json.loads(fixed)
 
     highlights = data.get("highlights")
 
