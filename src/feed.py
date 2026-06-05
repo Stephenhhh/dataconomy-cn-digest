@@ -10,6 +10,7 @@ network, which is trusted by the origin's own Cloudflare WAF.
 from __future__ import annotations
 
 import logging
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -132,11 +133,78 @@ def _parse_pub_date(raw: Optional[str]) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
+# --- Spam / SEO parasite content filter ---
+# Keywords strongly associated with gambling/casino spam injections.
+# Matching is case-insensitive against title + raw HTML content.
+_SPAM_KEYWORDS: list[str] = [
+    # English
+    "casino", "gambling", "slot machine", "sports betting", "poker room",
+    "welcome bonus", "free spins", "wagering", "bookmaker", "sportsbook",
+    # German
+    "spieler", "spielothek", "freispiele", "einzahlung", "wettanbieter",
+    # Finnish
+    "kasino", "pelaa", "ilmaiskierrokset", "kasinobonukset",
+    # Spanish
+    "tragamonedas", "apuestas", "bono de bienvenida",
+    # Chinese
+    "赌场", "博彩", "老虎机", "真人赌场", "体育博彩", "欢迎奖金",
+    "投注", "牌照", "兹罗提", "免费投注", "赌博",
+    # Brand names frequently seen in spam injections
+    "MGA牌照", "MGA 牌照",
+]
+
+# Pre-compile a single regex for speed
+_SPAM_RE = re.compile(
+    "|".join(re.escape(kw) for kw in _SPAM_KEYWORDS),
+    re.IGNORECASE,
+)
+
+
+def _is_spam(post: dict) -> bool:
+    """Heuristic check: return True if a WP post looks like injected spam.
+
+    Signals:
+    1. Title or content matches known spam keywords
+    2. Post has NO categories (legit Dataconomy articles always have ≥1 category)
+    3. Multiple spam keywords hit (even 1 match + no category → spam)
+    """
+    title = (post.get("title", {}).get("rendered") or "").strip()
+    content = (post.get("content", {}).get("rendered") or "")[:2000]  # first 2k chars
+    text = f"{title} {content}"
+
+    has_categories = bool(post.get("categories"))
+    matches = _SPAM_RE.findall(text)
+
+    if len(matches) >= 2:
+        # Multiple spam keywords → definitely spam
+        return True
+    if matches and not has_categories:
+        # Single keyword + no category → very likely spam
+        return True
+    return False
+
+
 def get_latest_items(limit: int = 10) -> list[FeedItem]:
     """Fetch latest posts from WP REST API and return as FeedItems."""
-    resp = _request_with_fallback(API_URL, WORKER_API_URL, params={"per_page": limit})
+    # Fetch more posts to account for spam filtering
+    fetch_limit = min(limit * 3, 30)
+    resp = _request_with_fallback(API_URL, WORKER_API_URL, params={"per_page": fetch_limit})
     posts = resp.json()
     logger.info("Fetched %d posts from WP REST API (%d bytes)", len(posts), len(resp.content))
+
+    # Filter out spam/SEO parasite content
+    clean_posts = []
+    spam_count = 0
+    for post in posts:
+        if _is_spam(post):
+            spam_count += 1
+            spam_title = (post.get("title", {}).get("rendered") or "?")[:60]
+            logger.warning("Filtered spam post: %s", spam_title)
+        else:
+            clean_posts.append(post)
+    if spam_count:
+        logger.warning("Filtered %d spam posts out of %d total", spam_count, len(posts))
+    posts = clean_posts
 
     # Collect all category IDs for batch resolution
     all_cat_ids: list[int] = []

@@ -67,7 +67,7 @@ def _load_cc_list() -> list[str]:
 def run(args: argparse.Namespace) -> int:
     items = feed.get_latest_items(limit=args.limit)
     if not items:
-        logger.warning("Feed returned 0 items; nothing to do.")
+        logger.warning("Feed returned 0 items (possibly all filtered as spam); nothing to do.")
         return 0
 
     state = dedup.load_state()
