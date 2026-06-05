@@ -140,17 +140,22 @@ _SPAM_KEYWORDS: list[str] = [
     # English
     "casino", "gambling", "slot machine", "sports betting", "poker room",
     "welcome bonus", "free spins", "wagering", "bookmaker", "sportsbook",
+    "jackpot", "roulette", "blackjack", "baccarat", "no deposit",
     # German
     "spieler", "spielothek", "freispiele", "einzahlung", "wettanbieter",
     # Finnish
-    "kasino", "pelaa", "ilmaiskierrokset", "kasinobonukset",
+    "kasino", "pelaa", "ilmaiskierrokset", "kasinobonukset", "pelaajalle",
     # Spanish
     "tragamonedas", "apuestas", "bono de bienvenida",
+    # Polish
+    "bonusy", "rejestracja", "graczy", "zakłady", "kasyno", "hazard",
+    "przewodnik dla graczy",
     # Chinese
     "赌场", "博彩", "老虎机", "真人赌场", "体育博彩", "欢迎奖金",
-    "投注", "牌照", "兹罗提", "免费投注", "赌博",
-    # Brand names frequently seen in spam injections
-    "MGA牌照", "MGA 牌照",
+    "投注", "牌照", "兹罗提", "免费投注", "赌博", "开玩笑吗",
+    # Known spam brand names (gambling sites seen in attack)
+    "MGA牌照", "MGA 牌照", "fezbet", "diva spin", "zoccer",
+    "cleobetra", "alterspin", "pistolo", "berriez",
 ]
 
 # Pre-compile a single regex for speed
@@ -164,23 +169,33 @@ def _is_spam(post: dict) -> bool:
     """Heuristic check: return True if a WP post looks like injected spam.
 
     Signals:
-    1. Title or content matches known spam keywords
-    2. Post has NO categories (legit Dataconomy articles always have ≥1 category)
-    3. Multiple spam keywords hit (even 1 match + no category → spam)
+    1. Post has NO categories → always spam (legit articles always have ≥1)
+    2. Title or content matches known spam keywords (≥1 match → spam)
+    3. Title contains non-Chinese/non-English foreign language text mixed with Chinese
     """
+    has_categories = bool(post.get("categories"))
+
+    # Rule 1: No category = spam (all legitimate Dataconomy CN articles have categories)
+    if not has_categories:
+        return True
+
     title = (post.get("title", {}).get("rendered") or "").strip()
     content = (post.get("content", {}).get("rendered") or "")[:2000]  # first 2k chars
     text = f"{title} {content}"
 
-    has_categories = bool(post.get("categories"))
+    # Rule 2: Any spam keyword match → spam
     matches = _SPAM_RE.findall(text)
+    if matches:
+        return True
 
-    if len(matches) >= 2:
-        # Multiple spam keywords → definitely spam
+    # Rule 3: Title with mixed CJK + non-English Latin chars (Polish/German/Finnish spam)
+    # Legit titles are purely Chinese or Chinese+English
+    has_cjk = bool(re.search(r"[\u4e00-\u9fff]", title))
+    # Detect non-ASCII Latin chars (ą, ö, ü, ń, etc.) which indicate foreign spam
+    has_foreign_latin = bool(re.search(r"[à-öø-ÿĀ-žƀ-ɏ]", title))
+    if has_cjk and has_foreign_latin:
         return True
-    if matches and not has_categories:
-        # Single keyword + no category → very likely spam
-        return True
+
     return False
 
 
