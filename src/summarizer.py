@@ -167,29 +167,44 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
         prompt = _build_prompt(items)
         logger.info("Calling Gemini %s for %d items...", MODEL, len(items))
 
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.3,
-                max_output_tokens=8192,
-                thinking_config=types.ThinkingConfig(thinking_budget=0),
-                response_mime_type="application/json",
-            ),
+        config = types.GenerateContentConfig(
+            temperature=0.3,
+            max_output_tokens=8192,
+            response_mime_type="application/json",
         )
 
-        text = response.text
-        if not text:
-            logger.warning("Gemini returned empty response")
-            return None
+        # Retry up to 2 times on empty/unparseable responses
+        last_error: Exception | None = None
+        for attempt in range(1, 3):
+            try:
+                response = client.models.generate_content(
+                    model=MODEL,
+                    contents=prompt,
+                    config=config,
+                )
 
-        logger.info("Gemini response length: %d chars", len(text))
-        logger.info("Gemini raw response: %s", text[:500])
-        result = _parse_response(text)
-        if result:
-            logger.info("Generated %d highlights", len(result.highlights))
-        return result
+                text = response.text
+                if not text:
+                    logger.warning("Gemini returned empty response (attempt %d)", attempt)
+                    last_error = RuntimeError("empty response")
+                    continue
+
+                logger.info("Gemini response length: %d chars (attempt %d)", len(text), attempt)
+                logger.info("Gemini raw response: %s", text[:500])
+                result = _parse_response(text)
+                if result:
+                    logger.info("Generated %d highlights", len(result.highlights))
+                    return result
+                else:
+                    logger.warning("Failed to parse Gemini response (attempt %d)", attempt)
+                    last_error = RuntimeError("parse failed")
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Gemini call failed (attempt %d): %s: %s", attempt, type(exc).__name__, exc)
+                last_error = exc
+
+        logger.warning("AI summary failed after retries: %s", last_error)
+        return None
 
     except Exception as exc:  # noqa: BLE001
-        logger.warning("AI summary failed: %s: %s", type(exc).__name__, exc)
+        logger.warning("AI summary setup failed: %s: %s", type(exc).__name__, exc)
         return None
