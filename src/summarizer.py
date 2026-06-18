@@ -1,4 +1,9 @@
-"""Generate AI-powered highlights and deks using Google Gemini 2.5 Flash."""
+"""Generate AI-powered translations and highlights using Google Gemini 2.5 Flash.
+
+Two main entry points:
+- translate_items(): Translate English articles to Chinese (title + summary)
+- generate_summary(): Generate Chinese highlight bullets from translated articles
+"""
 from __future__ import annotations
 
 import html as html_mod
@@ -37,6 +42,162 @@ def _strip_html(raw: str) -> str:
     text = _TAG_RE.sub(" ", text)
     text = html_mod.unescape(_WHITESPACE_RE.sub(" ", text)).strip()
     return text
+
+
+_MAX_EN_CHARS = 1500  # Max English chars per article to send for translation
+
+
+def _build_translate_prompt(items: list["FeedItem"]) -> str:
+    """Build prompt to translate English articles to Chinese."""
+    articles = []
+    for i, it in enumerate(items, 1):
+        plaintext = _strip_html(it.summary_html_en or it.summary_html)
+        # Truncate to save tokens
+        if len(plaintext) > _MAX_EN_CHARS:
+            plaintext = plaintext[:_MAX_EN_CHARS].rstrip() + "..."
+        articles.append(f"[Article {i}]\nTitle: {it.title_en or it.title}\nContent: {plaintext}")
+
+    article_block = "\n\n".join(articles)
+
+    return f"""You are an expert tech news translator. Translate the following {len(items)} English tech news articles into natural, fluent Chinese.
+
+Requirements:
+- Title: Accurately convey the meaning, ideally within 25 Chinese characters
+- Summary: Translate the key content into 2-4 concise Chinese paragraphs, each 1-3 sentences
+- Add a half-width space between Chinese and English text (e.g. "Apple 发布", "AI 模型")
+- Add a space between numbers and Chinese text (e.g. "3 个月", "100 万")
+- Keep technical terms in English (e.g. API, GPU, LLM, IoT)
+- Use common Chinese translations for well-known companies (e.g. Google→谷歌, Apple→苹果, Microsoft→微软) but keep the English name alongside if it helps clarity
+- Do NOT fabricate information not present in the original
+- Do NOT include any explanatory notes or translator comments
+
+Output strictly as JSON:
+{{
+  "articles": [
+    {{
+      "index": 1,
+      "title_zh": "翻译后的中文标题",
+      "summary_zh": "第一段翻译内容。\\n\\n第二段翻译内容。"
+    }}
+  ]
+}}
+
+Articles to translate:
+
+{article_block}"""
+
+
+def _parse_translate_response(text: str, n_items: int) -> list[dict] | None:
+    """Parse translation response JSON."""
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        first_nl = cleaned.index("\n") if "\n" in cleaned else 3
+        cleaned = cleaned[first_nl + 1:]
+        if cleaned.endswith("```"):
+            cleaned = cleaned[:-3]
+        cleaned = cleaned.strip()
+
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        fixed = _fix_json(cleaned)
+        try:
+            data = json.loads(fixed)
+        except json.JSONDecodeError as exc:
+            logger.warning("Failed to parse translation JSON: %s", exc)
+            return None
+
+    articles = data.get("articles")
+    if not isinstance(articles, list):
+        logger.warning("Translation response missing 'articles' key")
+        return None
+
+    return articles
+
+
+def translate_items(items: list["FeedItem"]) -> None:
+    """Translate English articles to Chinese using Gemini. Modifies items in-place.
+
+    On failure, items retain their original English content (graceful degradation).
+    """
+    import time
+
+    if not items:
+        return
+
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        logger.info("GEMINI_API_KEY not set, skipping translation (English content will be used).")
+        return
+
+    try:
+        from google import genai
+        from google.genai import types
+
+        client = genai.Client(api_key=api_key)
+        prompt = _build_translate_prompt(items)
+        logger.info("Calling Gemini %s to translate %d articles...", MODEL, len(items))
+
+        config = types.GenerateContentConfig(
+            temperature=0.2,
+            max_output_tokens=16384,
+            response_mime_type="application/json",
+        )
+
+        last_error: Exception | None = None
+        for attempt in range(1, 4):
+            try:
+                response = client.models.generate_content(
+                    model=MODEL,
+                    contents=prompt,
+                    config=config,
+                )
+
+                text = response.text
+                if not text:
+                    logger.warning("Gemini translation returned empty (attempt %d)", attempt)
+                    last_error = RuntimeError("empty response")
+                    time.sleep(3 * attempt)
+                    continue
+
+                logger.info("Translation response: %d chars (attempt %d)", len(text), attempt)
+                articles = _parse_translate_response(text, len(items))
+                if not articles:
+                    last_error = RuntimeError("parse failed")
+                    time.sleep(3 * attempt)
+                    continue
+
+                # Apply translations to items
+                translated_count = 0
+                for art in articles:
+                    idx = art.get("index", 0) - 1  # 1-based to 0-based
+                    if 0 <= idx < len(items):
+                        title_zh = art.get("title_zh", "").strip()
+                        summary_zh = art.get("summary_zh", "").strip()
+                        if title_zh:
+                            items[idx].title = title_zh
+                        if summary_zh:
+                            # Convert plain text paragraphs to HTML
+                            paragraphs = [p.strip() for p in summary_zh.split("\n\n") if p.strip()]
+                            if not paragraphs:
+                                paragraphs = [summary_zh]
+                            items[idx].summary_html = "".join(
+                                f"<p>{p}</p>" for p in paragraphs
+                            )
+                        translated_count += 1
+
+                logger.info("Successfully translated %d/%d articles", translated_count, len(items))
+                return
+
+            except Exception as exc:
+                logger.warning("Translation attempt %d failed: %s: %s", attempt, type(exc).__name__, exc)
+                last_error = exc
+                time.sleep(3 * attempt)
+
+        logger.warning("Translation failed after retries: %s (using English content)", last_error)
+
+    except Exception as exc:
+        logger.warning("Translation setup failed: %s: %s (using English content)", type(exc).__name__, exc)
 
 
 def _build_prompt(items: list["FeedItem"]) -> str:
@@ -153,6 +314,8 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
     Returns SummaryResult on success, or None if unavailable/failed.
     Never raises.
     """
+    import time
+
     api_key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not api_key:
         logger.info("GEMINI_API_KEY not set, skipping AI summary.")
@@ -167,15 +330,20 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
         prompt = _build_prompt(items)
         logger.info("Calling Gemini %s for %d items...", MODEL, len(items))
 
+        # Wait before calling to avoid TPM conflicts with translate_items()
+        # Gemini 2.5 Flash free tier has 250K TPM; thinking tokens from
+        # the translation call may still be counted in the same minute window.
+        time.sleep(5)
+
         config = types.GenerateContentConfig(
             temperature=0.3,
             max_output_tokens=8192,
             response_mime_type="application/json",
         )
 
-        # Retry up to 2 times on empty/unparseable responses
+        # Retry up to 3 times on empty/unparseable responses with backoff
         last_error: Exception | None = None
-        for attempt in range(1, 3):
+        for attempt in range(1, 4):
             try:
                 response = client.models.generate_content(
                     model=MODEL,
@@ -187,6 +355,7 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
                 if not text:
                     logger.warning("Gemini returned empty response (attempt %d)", attempt)
                     last_error = RuntimeError("empty response")
+                    time.sleep(3 * attempt)
                     continue
 
                 logger.info("Gemini response length: %d chars (attempt %d)", len(text), attempt)
@@ -198,9 +367,11 @@ def generate_summary(items: list["FeedItem"]) -> SummaryResult | None:
                 else:
                     logger.warning("Failed to parse Gemini response (attempt %d)", attempt)
                     last_error = RuntimeError("parse failed")
+                    time.sleep(3 * attempt)
             except Exception as exc:  # noqa: BLE001
                 logger.warning("Gemini call failed (attempt %d): %s: %s", attempt, type(exc).__name__, exc)
                 last_error = exc
+                time.sleep(3 * attempt)
 
         logger.warning("AI summary failed after retries: %s", last_error)
         return None

@@ -1,11 +1,12 @@
-"""Fetch and parse the Dataconomy CN posts via WordPress REST API.
+"""Fetch and parse Dataconomy posts via WordPress REST API.
 
 Strategy:
-- Primary: Direct WP REST API call (works from most IPs)
+- Primary: Direct WP REST API call to English site (dataconomy.com)
 - Fallback: Cloudflare Worker proxy (for GitHub Actions US IPs blocked by WAF)
 
-The Worker proxies requests to cn.dataconomy.com from Cloudflare's edge
-network, which is trusted by the origin's own Cloudflare WAF.
+English site is used as the primary source because the Chinese site
+(cn.dataconomy.com) is heavily polluted by SEO spam. Articles are
+translated to Chinese via Gemini in the summarizer module.
 """
 from __future__ import annotations
 
@@ -21,14 +22,13 @@ from dateutil import parser as dateparser
 
 logger = logging.getLogger(__name__)
 
-# Direct WP REST API (works from non-blocked IPs)
-API_URL = "https://cn.dataconomy.com/wp-json/wp/v2/posts"
-CATEGORY_API_URL = "https://cn.dataconomy.com/wp-json/wp/v2/categories"
+# Direct WP REST API — English site (clean, no spam)
+API_URL = "https://dataconomy.com/wp-json/wp/v2/posts"
+CATEGORY_API_URL = "https://dataconomy.com/wp-json/wp/v2/categories"
 
 # Cloudflare Worker proxy (fallback for blocked IPs like GitHub Actions)
-# Worker passes through requests to cn.dataconomy.com WP API
-WORKER_API_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/wp-json/wp/v2/posts"
-WORKER_CATEGORY_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/wp-json/wp/v2/categories"
+WORKER_API_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/en/wp-json/wp/v2/posts"
+WORKER_CATEGORY_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/en/wp-json/wp/v2/categories"
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -47,6 +47,9 @@ class FeedItem:
     summary_html: str
     author: Optional[str] = None
     categories: list[str] = field(default_factory=list)
+    # Original English content (preserved for reference)
+    title_en: str = ""
+    summary_html_en: str = ""
 
 
 def _request_single(url: str, params: dict | None = None) -> requests.Response:
@@ -200,25 +203,52 @@ def _is_spam(post: dict) -> bool:
 
 
 def get_latest_items(limit: int = 10) -> list[FeedItem]:
-    """Fetch latest posts from WP REST API and return as FeedItems."""
-    # Fetch more posts to account for spam filtering
-    fetch_limit = min(limit * 3, 30)
-    resp = _request_with_fallback(API_URL, WORKER_API_URL, params={"per_page": fetch_limit})
-    posts = resp.json()
-    logger.info("Fetched %d posts from WP REST API (%d bytes)", len(posts), len(resp.content))
+    """Fetch latest posts from WP REST API and return as FeedItems.
 
-    # Filter out spam/SEO parasite content
-    clean_posts = []
-    spam_count = 0
-    for post in posts:
-        if _is_spam(post):
-            spam_count += 1
-            spam_title = (post.get("title", {}).get("rendered") or "?")[:60]
-            logger.warning("Filtered spam post: %s", spam_title)
-        else:
-            clean_posts.append(post)
-    if spam_count:
-        logger.warning("Filtered %d spam posts out of %d total", spam_count, len(posts))
+    Paginates through multiple pages if spam filtering removes all posts
+    from the first page (e.g. during SEO spam attacks).
+    """
+    per_page = 30
+    max_pages = 10  # safety limit: don't fetch more than 300 posts
+    clean_posts: list[dict] = []
+    total_spam = 0
+    total_fetched = 0
+
+    for page in range(1, max_pages + 1):
+        try:
+            resp = _request_with_fallback(
+                API_URL, WORKER_API_URL,
+                params={"per_page": per_page, "page": page},
+            )
+        except Exception as exc:
+            logger.warning("Failed to fetch page %d: %s", page, exc)
+            break
+
+        posts = resp.json()
+        if not posts:
+            break  # no more pages
+        total_fetched += len(posts)
+
+        if page == 1:
+            logger.info("Fetched %d posts from WP REST API (%d bytes)", len(posts), len(resp.content))
+
+        # Filter out spam/SEO parasite content
+        for post in posts:
+            if _is_spam(post):
+                total_spam += 1
+                if page == 1:  # only log spam titles for first page to avoid noise
+                    spam_title = (post.get("title", {}).get("rendered") or "?")[:60]
+                    logger.warning("Filtered spam post: %s", spam_title)
+            else:
+                clean_posts.append(post)
+
+        # Stop paginating once we have enough clean posts
+        if len(clean_posts) >= limit:
+            break
+
+    if total_spam:
+        logger.warning("Filtered %d spam posts out of %d total (scanned %d pages)",
+                       total_spam, total_fetched, min(page, max_pages))
     posts = clean_posts
 
     # Collect all category IDs for batch resolution
@@ -258,6 +288,8 @@ def get_latest_items(limit: int = 10) -> list[FeedItem]:
                 summary_html=summary_html,
                 author=None,  # WP API returns author ID, not name
                 categories=categories,
+                title_en=title,
+                summary_html_en=summary_html,
             )
         )
 

@@ -40,52 +40,39 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <title>{{ subject }}</title>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-    <tr><td align="center">
-      <table role="presentation" width="680" cellspacing="0" cellpadding="0" border="0" style="max-width:680px;">
-    <tr><td style="padding:24px 28px 8px 28px;">
-      <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
-      <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
-    </td></tr>
-    {% if highlights %}
-    <tr><td style="padding:20px 28px 0 28px;">
-      <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
-        {% for h in highlights %}
-        <tr>
-          <td valign="top" style="width:20px;padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;font-weight:700;color:#07C160;line-height:1.6;">{{ loop.index }}.</td>
-          <td valign="top" style="padding:{% if not loop.first %}6px{% else %}0px{% endif %} 0 0 0;font-size:15px;line-height:1.6;color:#424245;">{{ h }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </td></tr>
-    {% endif %}
-    {% for item in items %}
-    <tr><td style="padding:0 28px;">
-      <div style="border-top:1px solid #F0F0F0;margin:32px 0;"></div>
-    </td></tr>
-    <tr><td style="padding:0 28px;">
-      <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
-      <div style="margin:0 0 14px 0;font-size:12px;color:#AEAEB2;">
-        {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {{ item.categories|join(' · ') }}{% endif %}
-      </div>
-      <div style="font-size:14px;line-height:1.8;color:#424245;">
-        {{ item.summary_html|safe }}
-      </div>
-      <div style="margin-top:16px;">
-        <a href="{{ item.link }}" style="font-size:14px;font-weight:500;color:#07C160;text-decoration:none;">阅读原文 →</a>
-      </div>
-    </td></tr>
+<div style="max-width:620px;margin:0 auto;padding:24px 28px;word-break:break-all;overflow-wrap:break-word;overflow:hidden;">
+  <h1 style="margin:0;font-size:20px;line-height:1.4;color:#1D1D1F;">Dataconomy CN 每日资讯</h1>
+  <p style="margin:4px 0 0 0;font-size:13px;color:#AEAEB2;">{{ beijing_date }} {{ beijing_weekday }} · {{ items|length }} 条</p>
+  {% if highlights %}
+  <div style="margin-top:20px;">
+    <div style="font-size:13px;font-weight:600;color:#07C160;margin-bottom:14px;">资讯速览</div>
+    {% for h in highlights %}
+    <div style="{% if not loop.first %}margin-top:6px;{% endif %}font-size:15px;line-height:1.6;color:#424245;">
+      <span style="font-weight:700;color:#07C160;">{{ loop.index }}.</span> {{ h }}
+    </div>
     {% endfor %}
-    <tr><td style="padding:0 28px;">
-      <div style="border-top:1px solid #F0F0F0;margin:32px 0 0 0;"></div>
-    </td></tr>
-    <tr><td style="padding:0 28px 24px 28px;font-size:12px;color:#AEAEB2;">
-      来源：<a href="https://cn.dataconomy.com/" style="color:#AEAEB2;">cn.dataconomy.com</a> · 生成于 {{ generated_at }}
-    </td></tr>
-      </table>
-    </td></tr>
-  </table>
+  </div>
+  {% endif %}
+  {% for item in items %}
+  <div style="border-top:1px solid #F0F0F0;margin:28px 0;"></div>
+  <div>
+    <a href="{{ item.link }}" style="color:#1D1D1F;text-decoration:none;font-size:18px;font-weight:700;line-height:1.45;display:block;margin-bottom:10px;">{{ item.title }}</a>
+    <div style="margin:0 0 12px 0;font-size:12px;color:#AEAEB2;">
+      {{ item.pub_beijing }}{% if item.author %} · {{ item.author }}{% endif %}{% if item.categories %} · {{ item.categories|join(' · ') }}{% endif %}
+    </div>
+    <div style="font-size:14px;line-height:1.7;color:#424245;">
+      {{ item.summary_html|safe }}
+    </div>
+    <div style="margin-top:14px;">
+      <a href="{{ item.link }}" style="font-size:14px;font-weight:500;color:#07C160;text-decoration:none;">阅读原文 →</a>
+    </div>
+  </div>
+  {% endfor %}
+  <div style="border-top:1px solid #F0F0F0;margin:28px 0 0 0;"></div>
+  <div style="font-size:12px;color:#AEAEB2;">
+    来源：<a href="https://dataconomy.com/" style="color:#AEAEB2;">dataconomy.com</a> · 生成于 {{ generated_at }}
+  </div>
+</div>
 </body>
 </html>
 """
@@ -149,23 +136,50 @@ def _sanitize_summary(raw: str) -> str:
     # Remove "精选图片来源" and everything after (sometimes without <hr>)
     cleaned = _FEATURED_IMAGE_RE.sub("", cleaned)
     # Style images: 8px rounded corners, border, margin, responsive
+    # First strip any existing style attribute from img tags, then add our own
     cleaned = re.sub(
-        r"<img\b",
-        '<img style="max-width:100%;height:auto;border-radius:8px;border:1px solid #EDEDED;margin:14px 0;display:block;"',
+        r"<img\b\s*(?:style=\"[^\"]*\"\s*)?",
+        '<img style="max-width:100%;height:auto;border-radius:8px;border:1px solid #EDEDED;margin:14px 0;display:block;" ',
         cleaned,
         flags=re.IGNORECASE,
     )
-    # Style paragraphs: add margin-bottom for breathing room
+    # Style paragraphs: replace any existing style, add margin-bottom for breathing room
     cleaned = re.sub(
-        r"<p\b([^>]*)>",
-        r'<p style="margin:0 0 14px 0;"\1>',
+        r"<p\b[^>]*>",
+        '<p style="margin:0 0 12px 0;">',
         cleaned,
         flags=re.IGNORECASE,
     )
-    # Style blockquotes: grey left border + light background
+    # Style blockquotes: grey left border + light background, constrain width
     cleaned = re.sub(
         r"<blockquote\b[^>]*>",
-        '<blockquote style="margin:14px 0;padding:14px 18px;border-left:3px solid #E5E5EA;background:#FAFAFA;border-radius:0 8px 8px 0;">',
+        '<blockquote style="margin:14px 0;padding:14px 18px;border-left:3px solid #E5E5EA;background:#FAFAFA;border-radius:0 8px 8px 0;max-width:100%;overflow:hidden;box-sizing:border-box;">',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    # Style headings: normalize h1-h6 to consistent smaller sizes within article body
+    # Article title is 18px, so sub-headings should be ≤ 16px
+    cleaned = re.sub(
+        r"<h[1-2]\b[^>]*>",
+        '<p style="margin:18px 0 8px 0;font-size:16px;font-weight:700;line-height:1.4;color:#1D1D1F;">',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"</h[1-2]>",
+        "</p>",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"<h[3-6]\b[^>]*>",
+        '<p style="margin:14px 0 6px 0;font-size:14px;font-weight:700;line-height:1.4;color:#1D1D1F;">',
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"</h[3-6]>",
+        "</p>",
         cleaned,
         flags=re.IGNORECASE,
     )

@@ -76,6 +76,10 @@ def run(args: argparse.Namespace) -> int:
         logger.info("No new items, skipping email.")
         return 0
 
+    # Translate English articles to Chinese via Gemini
+    # (generate_summary will be called after; a delay is added inside to avoid TPM conflicts)
+    summarizer.translate_items(new_items)
+
     # Log categories for analysis
     all_cats: set[str] = set()
     for it in new_items:
@@ -84,7 +88,7 @@ def run(args: argparse.Namespace) -> int:
         logger.info("Categories in this batch: %s", ", ".join(sorted(all_cats)))
 
     # Sort items by category priority
-    _CATEGORY_ORDER = ["Tech", "研究", "人工智能", "消息", "行业", "网络安全"]
+    _CATEGORY_ORDER = ["Tech", "Research", "Artificial Intelligence", "News", "Industry", "Cybersecurity"]
 
     def _sort_key(item: feed.FeedItem) -> int:
         """Return the best (lowest) priority among the item's categories."""
@@ -100,6 +104,11 @@ def run(args: argparse.Namespace) -> int:
     # AI summary generation (graceful degradation)
     summary_result = summarizer.generate_summary(new_items)
     highlights = summary_result.highlights if summary_result else []
+
+    # Fallback: if AI highlights failed, use first 3 article titles as highlights
+    if not highlights and new_items:
+        highlights = [it.title for it in new_items[:3]]
+        logger.info("Using article titles as fallback highlights (%d)", len(highlights))
 
     # Sort highlights by category priority of their source articles, then reorder items
     if summary_result and summary_result.highlight_refs:
