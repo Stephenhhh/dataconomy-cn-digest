@@ -1,6 +1,12 @@
 {
-  "last_run_utc": "2026-06-17T05:22:57Z",
+  "last_run_utc": "2026-06-18T05:13:42Z",
   "seen_ids": [
+    "https://cn.dataconomy.com/2026/06/17/%e8%b0%b7%e6%ad%8c%e5%8f%91%e5%b8%83android-17/",
+    "https://cn.dataconomy.com/2026/06/17/%e5%a4%a7%e5%a4%9a%e6%95%b0%e8%8b%b1%e5%9b%bd%e4%b8%ad%e5%b0%8f%e4%bc%81%e4%b8%9a%e7%8e%b0%e5%9c%a8%e5%9c%a8%e4%bc%9a%e8%ae%a1%e5%b8%88%e4%b9%8b%e5%89%8d%e5%92%a8%e8%af%a2%e4%ba%ba%e5%b7%a5%e6%99%ba/",
+    "https://cn.dataconomy.com/2026/06/17/2026-%e5%b9%b4%e9%92%88%e5%af%b9%e6%97%85%e8%a1%8c%e8%80%85%e7%9a%84%e7%bd%91%e7%bb%9c%e9%92%93%e9%b1%bc%e8%af%88%e9%aa%97%e6%95%b0%e9%87%8f%e5%88%9b%e5%8e%86%e5%8f%b2%e6%96%b0%e9%ab%98/",
+    "https://cn.dataconomy.com/2026/06/17/ai%e8%bf%81%e7%a7%bb%e5%ad%a6%e4%b9%a0%e5%8a%a0%e9%80%9f%e5%ae%87%e5%ae%99%e5%ad%a6%e7%a0%94%e7%a9%b6%e4%bd%86%e9%9a%90%e8%97%8f%e9%a3%8e%e9%99%a9/",
+    "https://cn.dataconomy.com/2026/06/17/adobe-%e6%8a%a5%e5%91%8a%e5%8f%91%e7%8e%b0-86-%e7%9a%84%e5%88%9b%e4%bd%9c%e8%80%85%e7%8e%b0%e5%9c%a8%e5%9c%a8%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%a8%8b%e4%b8%ad%e4%bd%bf%e7%94%a8%e7%94%9f%e6%88%90%e5%bc%8f/",
+    "https://cn.dataconomy.com/2026/06/17/%e5%8f%8c%e5%ad%90%e5%ba%a7%e6%83%85%e7%bb%aa%e4%bd%8e%e8%90%bd%e5%90%97%ef%bc%9f%e7%94%a8%e6%88%b7%e6%8a%a5%e5%91%8a-google-gemini-%e5%ad%98%e5%9c%a8%e9%97%ae%e9%a2%98/",
     "https://cn.dataconomy.com/2026/06/16/tesla-cybercab-%e8%a7%84%e6%a0%bc%e6%98%be%e7%a4%ba-epa-%e9%a2%84%e8%ae%a1%e7%bb%ad%e8%88%aa%e9%87%8c%e7%a8%8b%e4%b8%ba-293-%e8%8b%b1%e9%87%8c/",
     "https://cn.dataconomy.com/2026/06/16/%e3%80%8a%e5%a4%a7%e8%a5%bf%e6%b4%8b%e6%9c%88%e5%88%8a%e3%80%8b%e5%9c%a8%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e8%ae%ad%e7%bb%83%e6%95%b0%e6%8d%ae%e4%b8%ad%e5%8f%91%e7%8e%b0%e4%ba%86%e6%95%b0%e7%99%be/",
     "https://cn.dataconomy.com/2026/06/16/%e8%8b%b1%e5%9b%bd%e7%a6%81%e6%ad%a216%e5%b2%81%e4%bb%a5%e4%b8%8b%e5%84%bf%e7%ab%a5%e4%bd%bf%e7%94%a8%e7%a4%be%e4%ba%a4%e5%aa%92%e4%bd%93/",
@@ -194,12 +200,6 @@
     "http://cn.dataconomy.com/2026/05/07/%e8%b0%b7%e6%ad%8cchrome%e6%b5%8f%e8%a7%88%e5%99%a8%e8%a2%ab%e6%8c%87%e6%8e%a7%e9%bb%98%e9%bb%98%e5%ae%89%e8%a3%85gemini-nano%e6%96%87%e4%bb%b6/",
     "http://cn.dataconomy.com/2026/05/07/linkedin-%e6%8e%a8%e5%87%ba%e5%b9%bf%e5%91%8a%e4%bb%a3%e7%90%86%e8%ae%a4%e8%af%81%e8%ae%a1%e5%88%92/",
     "http://cn.dataconomy.com/2026/05/07/snap-%e7%bb%88%e6%ad%a2%e4%b8%8e-perplexity-%e4%bb%b7%e5%80%bc-4-%e4%ba%bf%e7%be%8e%e5%85%83%e7%9a%84%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e6%90%9c%e7%b4%a2%e5%90%88%e4%bd%9c%e4%bc%99%e4%bc%b4%e5%85%b3/",
-    "http://cn.dataconomy.com/2026/05/07/panathenea-%e7%9a%84%e5%bb%ba%e8%ae%be%e8%80%85%e6%ad%a3%e5%9c%a8%e9%87%8d%e6%96%b0%e6%80%9d%e8%80%83%e7%a7%91%e6%8a%80%e8%81%9a%e4%bc%9a%e7%9a%84%e6%84%8f%e4%b9%89/",
-    "http://cn.dataconomy.com/2026/05/06/android-%e4%b8%8a%e7%9a%84-chrome-%e6%b7%bb%e5%8a%a0%e4%ba%86%e5%a4%a7%e8%87%b4%e4%bd%8d%e7%bd%ae%e5%85%b1%e4%ba%ab/",
-    "http://cn.dataconomy.com/2026/05/06/%e6%a0%b9%e6%8d%ae%e6%96%b0%e7%9a%84-ceo-%e6%8c%87%e4%bb%a4%ef%bc%8cxbox-%e5%b0%86%e4%bb%8e-xbox-%e4%b8%ad%e5%88%a0%e9%99%a4-copilot/",
-    "http://cn.dataconomy.com/2026/05/06/%e8%8b%b9%e6%9e%9c%e5%b0%86%e5%9c%a8-ios-27-%e4%b8%ad%e5%85%81%e8%ae%b8%e7%94%a8%e6%88%b7%e9%80%89%e6%8b%a9%e7%ac%ac%e4%b8%89%e6%96%b9-ai-%e6%a8%a1%e5%9e%8b/",
-    "http://cn.dataconomy.com/2026/05/06/google-home-%e5%ba%94%e7%94%a8%e7%a8%8b%e5%ba%8f%e8%8e%b7%e5%be%97%e7%9b%b8%e6%9c%ba%e5%8d%87%e7%ba%a7%e5%92%8c-gemini-%e5%8a%9f%e8%83%bd/",
-    "http://cn.dataconomy.com/2026/05/06/alexa-%e7%99%bb%e9%99%86-bose-%e6%89%ac%e5%a3%b0%e5%99%a8%e5%92%8c%e6%9d%a1%e5%bd%a2%e9%9f%b3%e7%ae%b1/",
-    "http://cn.dataconomy.com/2026/05/06/openai-%e8%ae%a9-gpt-5-5-instant-%e6%88%90%e4%b8%ba%e9%bb%98%e8%ae%a4%e7%9a%84-chatgpt-%e6%a8%a1%e5%9e%8b/"
+    "http://cn.dataconomy.com/2026/05/07/panathenea-%e7%9a%84%e5%bb%ba%e8%ae%be%e8%80%85%e6%ad%a3%e5%9c%a8%e9%87%8d%e6%96%b0%e6%80%9d%e8%80%83%e7%a7%91%e6%8a%80%e8%81%9a%e4%bc%9a%e7%9a%84%e6%84%8f%e4%b9%89/"
   ]
 }
