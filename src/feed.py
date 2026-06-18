@@ -26,9 +26,11 @@ logger = logging.getLogger(__name__)
 API_URL = "https://dataconomy.com/wp-json/wp/v2/posts"
 CATEGORY_API_URL = "https://dataconomy.com/wp-json/wp/v2/categories"
 
-# Cloudflare Worker proxy (fallback for blocked IPs like GitHub Actions)
-WORKER_API_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/en/wp-json/wp/v2/posts"
-WORKER_CATEGORY_URL = "https://dataconomy-proxy.stephenhhh97.workers.dev/en/wp-json/wp/v2/categories"
+# Fallback: same direct URL (retry with different timing)
+# The Worker proxy was built for cn.dataconomy.com and may not work for the English site.
+# English site (dataconomy.com) is not behind the same WAF, so direct access should work.
+WORKER_API_URL = "https://dataconomy.com/wp-json/wp/v2/posts"
+WORKER_CATEGORY_URL = "https://dataconomy.com/wp-json/wp/v2/categories"
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "

@@ -258,5 +258,5 @@ def render_text(
         if summary_text:
             lines.append(f"   {summary_text}")
         lines.append("")
-    lines.append("-- 来源：cn.dataconomy.com --")
+    lines.append("-- 来源：dataconomy.com --")
     return "\n".join(lines)
