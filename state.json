@@ -1,6 +1,13 @@
 {
-  "last_run_utc": "2026-08-08T02:27:46Z",
+  "last_run_utc": "2026-08-11T02:33:57Z",
   "seen_ids": [
+    "https://cn.dataconomy.com/2026/08/10/%e4%b8%89%e6%98%9f-hbm4-%e5%86%85%e5%ad%98%e6%94%b6%e7%9b%8a%e7%8e%87%e8%be%be%e5%88%b0-80/",
+    "https://cn.dataconomy.com/2026/08/10/%e8%b0%b7%e6%ad%8c%e5%bc%80%e6%ba%90-tpu-raiden-%e4%bb%a5%e5%ae%9e%e7%8e%b0%e6%9b%b4%e5%bf%ab%e7%9a%84%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e6%8e%a8%e7%90%86/",
+    "https://cn.dataconomy.com/2026/08/10/%e8%8b%b9%e6%9e%9c%e8%af%84%e4%bc%b0%e9%95%bf%e9%91%ab%e5%ad%98%e5%82%a8%e4%b8%ba%e6%bd%9c%e5%9c%a8%e7%9a%84%e6%96%b0%e5%86%85%e5%ad%98%e4%be%9b%e5%ba%94%e5%95%86/",
+    "https://cn.dataconomy.com/2026/08/10/android%e7%94%a8%e6%88%b7%e6%8a%b1%e6%80%a8%e6%9c%aa%e7%bb%8f%e8%ae%b8%e5%8f%af%e6%92%ad%e6%94%beyoutube%e8%a7%86%e9%a2%91/",
+    "https://cn.dataconomy.com/2026/08/10/%e7%b4%a2%e5%b0%bc%e5%92%8c%e5%8f%b0%e7%a7%af%e7%94%b5%e8%ae%a1%e5%88%92%e6%96%a5%e8%b5%84-63-%e4%ba%bf%e7%be%8e%e5%85%83%e5%9c%a8%e6%97%a5%e6%9c%ac%e5%bb%ba%e7%ab%8b%e5%9b%be%e5%83%8f%e4%bc%a0/",
+    "https://cn.dataconomy.com/2026/08/10/anthropic-%e5%b0%86%e8%87%aa%e5%8a%a8%e6%a8%a1%e5%bc%8f%e8%ae%be%e4%b8%ba-claude-code-%e7%9a%84%e9%bb%98%e8%ae%a4%e6%a8%a1%e5%bc%8f/",
+    "https://cn.dataconomy.com/2026/08/10/openai-%e6%94%b6%e8%b4%ad%e6%bc%94%e7%a4%ba%e5%88%9d%e5%88%9b%e5%85%ac%e5%8f%b8-nextslide/",
     "https://cn.dataconomy.com/2026/08/07/openai%e4%b8%8elovefrom%e5%90%88%e4%bd%9c%e5%bc%80%e5%8f%91%e7%94%9c%e7%94%9c%e5%9c%88%e5%bd%a2%e7%8a%b6%e7%9a%84%e6%99%ba%e8%83%bd%e9%9f%b3%e7%ae%b1/",
     "https://cn.dataconomy.com/2026/08/07/%e7%a0%94%e7%a9%b6%e5%8f%91%e7%8e%b0%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e8%ae%be%e8%ae%a1%e7%9a%84%e7%97%85%e6%af%92%e5%9c%a8%e7%bb%86%e8%8f%8c%e5%86%85%e6%88%90%e5%8a%9f%e7%b9%81%e6%ae%96/",
     "https://cn.dataconomy.com/2026/08/07/tiktok-%e5%b0%86%e8%a3%81%e5%91%98-250-%e4%ba%ba%e5%b9%b6%e5%85%b3%e9%97%ad%e7%ba%b3%e4%bb%80%e7%bb%b4%e5%b0%94%e5%8a%9e%e4%ba%8b%e5%a4%84/",
@@ -193,13 +200,6 @@
     "https://cn.dataconomy.com/2026/07/07/android-%e5%a4%87%e4%bb%bd%e6%95%b0%e6%8d%ae%e7%8e%b0%e5%9c%a8%e4%bc%9a%e5%bd%b1%e5%93%8d-google-%e5%b8%90%e6%88%b7%e5%ad%98%e5%82%a8/",
     "https://cn.dataconomy.com/2026/07/07/%e4%b8%ba%e4%bb%80%e4%b9%88-hpe-%e4%b8%8e-trustwise-%e5%90%88%e4%bd%9c%e4%bc%99%e4%bc%b4%e5%85%b3%e7%b3%bb%e4%b8%ba%e4%bc%81%e4%b8%9a-ai-%e6%b2%bb%e7%90%86%e5%88%b6%e5%ae%9a%e4%ba%86%e6%96%b0%e8%93%9d/",
     "https://cn.dataconomy.com/2026/07/07/xbox-%e7%a1%ae%e8%ae%a4%e5%be%ae%e8%bd%af%e6%b8%b8%e6%88%8f%e5%9b%a2%e9%98%9f%e8%a3%81%e5%91%98-3200-%e4%ba%ba/",
-    "https://cn.dataconomy.com/2026/07/07/%e8%8b%b9%e6%9e%9c%e5%9c%a8-ios-27-beta-%e4%b8%ad%e6%b7%bb%e5%8a%a0-siri-%e8%af%ad%e9%9f%b3%e6%8e%a7%e5%88%b6/",
-    "https://cn.dataconomy.com/2026/07/07/%e8%8b%b9%e6%9e%9c%e5%8f%af%e6%8a%98%e5%8f%a0-iphone-ultra-2026-%e5%b9%b4%e6%8e%a8%e5%87%ba%e5%8f%af%e8%83%bd%e9%9d%a2%e4%b8%b4%e7%9f%ad%e7%bc%ba/",
-    "https://cn.dataconomy.com/2026/07/06/%e3%80%8a%e4%b8%ad%e9%80%94%e6%97%85%e7%a8%8b%e3%80%8b%e4%bf%83%e4%bd%bf%e5%a5%bd%e8%8e%b1%e5%9d%9e%e7%94%b5%e5%bd%b1%e5%85%ac%e5%8f%b8%e6%8a%ab%e9%9c%b2%e5%86%85%e9%83%a8%e4%ba%ba%e5%b7%a5%e6%99%ba/",
-    "https://cn.dataconomy.com/2026/07/06/%e7%b4%a2%e5%b0%bc%e5%b0%86%e7%bb%a7%e7%bb%ad%e4%b8%ba-2028-%e5%b9%b4%e4%b9%8b%e5%89%8d%e7%9a%84-playstation-%e6%b8%b8%e6%88%8f%e7%94%9f%e4%ba%a7%e5%85%89%e7%9b%98/",
-    "https://cn.dataconomy.com/2026/07/06/%e9%98%bf%e9%87%8c%e5%b7%b4%e5%b7%b4%e7%a6%81%e6%ad%a2%e5%91%98%e5%b7%a5%e4%bd%bf%e7%94%a8-anthropic-%e7%9a%84%e5%85%8b%e5%8a%b3%e5%be%b7%e4%bb%a3%e7%a0%81/",
-    "https://cn.dataconomy.com/2026/07/06/%e4%b8%89%e6%98%9f%e7%a1%ae%e8%ae%a4-one-ui-9-beta-4-%e5%b0%86%e4%ba%8e%e4%b8%8b%e5%91%a8%e5%8f%91%e5%b8%83/",
-    "https://cn.dataconomy.com/2026/07/06/%e4%ba%9a%e9%a9%ac%e9%80%8a%e5%b0%86%e4%ba%8e-7-%e6%9c%88%e5%81%9c%e6%ad%a2%e5%90%91%e6%96%b0%e5%ae%a2%e6%88%b7%e5%bc%80%e6%94%be-mechanical-turk/",
-    "https://cn.dataconomy.com/2026/07/06/%e4%bc%98%e6%ad%a5%e6%9a%82%e5%81%9c%e5%90%91%e4%ba%94%e4%b8%aa%e6%ac%a7%e6%b4%b2%e5%b8%82%e5%9c%ba%e7%9a%84%e6%89%a9%e5%bc%a0/"
+    "https://cn.dataconomy.com/2026/07/07/%e8%8b%b9%e6%9e%9c%e5%9c%a8-ios-27-beta-%e4%b8%ad%e6%b7%bb%e5%8a%a0-siri-%e8%af%ad%e9%9f%b3%e6%8e%a7%e5%88%b6/"
   ]
 }
