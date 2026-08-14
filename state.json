@@ -1,6 +1,16 @@
 {
-  "last_run_utc": "2026-08-13T03:07:32Z",
+  "last_run_utc": "2026-08-14T03:06:14Z",
   "seen_ids": [
+    "https://cn.dataconomy.com/2026/08/13/%e8%b0%b7%e6%ad%8c%e6%8e%a8%e5%87%ba%e5%94%ae%e4%bb%b7-29-%e7%be%8e%e5%85%83%e7%9a%84-android-pixel-tag-%e7%89%a9%e5%93%81%e8%bf%bd%e8%b8%aa%e5%99%a8/",
+    "https://cn.dataconomy.com/2026/08/13/500-%e4%b8%87%e7%be%8e%e5%85%83%e7%9a%84%e7%8e%b0%e5%ae%9e%e6%a3%80%e9%aa%8c%ef%bc%9a%e4%b8%ba%e4%bb%80%e4%b9%88%e4%bc%81%e4%b8%9a%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e6%b2%a1%e6%9c%89%e5%88%b9/",
+    "https://cn.dataconomy.com/2026/08/13/%e6%96%b0%e7%9a%84-shieldbreak-%e9%9b%b6%e6%97%a5%e6%bc%8f%e6%b4%9e%e8%ae%a9%e9%bb%91%e5%ae%a2%e8%83%bd%e5%a4%9f%e5%ae%8c%e5%85%a8%e8%ae%bf%e9%97%ae-windows/",
+    "https://cn.dataconomy.com/2026/08/13/pixel-watch-%e5%a2%9e%e5%8a%a0%e4%ba%86%e8%a1%80%e5%8e%8b%e5%92%8c%e8%83%b0%e5%b2%9b%e7%b4%a0%e6%8a%b5%e6%8a%97%e8%bf%bd%e8%b8%aa%e5%8a%9f%e8%83%bd/",
+    "https://cn.dataconomy.com/2026/08/13/pixel-watch-5-%e8%b5%b7%e5%94%ae%e4%bb%b7-399-%e7%be%8e%e5%85%83%ef%bc%8c%e5%85%b7%e6%9c%89%e5%8d%87%e7%ba%a7%e7%9a%84%e6%80%a7%e8%83%bd%e5%92%8c-64gb-%e5%ad%98%e5%82%a8%e7%a9%ba%e9%97%b4/",
+    "https://cn.dataconomy.com/2026/08/13/%e8%b0%b7%e6%ad%8c%e6%8e%a8%e5%87%ba-pixel-11-pro-%e5%92%8c-pro-xl%ef%bc%8c%e8%b5%b7%e4%bb%b7-1099-%e7%be%8e%e5%85%83/",
+    "https://cn.dataconomy.com/2026/08/13/%e8%b0%b7%e6%ad%8c%e6%8e%a8%e5%87%ba-pixel-11-pro-fold-%e8%b5%b7%e5%94%ae%e4%bb%b7-1899-%e7%be%8e%e5%85%83/",
+    "https://cn.dataconomy.com/2026/08/13/claude-cowork-%e5%9c%a8-chrome-%e6%89%a9%e5%b1%95%e4%b8%ad%e4%b8%ba-max-%e5%92%8c-team-%e7%94%a8%e6%88%b7%e6%8e%a8%e5%87%ba/",
+    "https://cn.dataconomy.com/2026/08/13/twitch-%e5%85%81%e8%ae%b8%e4%b8%bb%e6%92%ad%e9%80%89%e6%8b%a9%e9%80%80%e5%87%ba%e7%94%9f%e6%88%90%e5%bc%8f-ai-%e8%ae%ad%e7%bb%83/",
+    "https://cn.dataconomy.com/2026/08/13/%e7%a0%94%e7%a9%b6%e5%8f%91%e7%8e%b0%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e9%a9%b1%e5%8a%a8%e7%9a%84%e8%a3%81%e5%91%98%e6%9c%aa%e8%83%bd%e5%b8%a6%e6%9d%a5%e7%94%9f%e4%ba%a7%e5%8a%9b%e7%9a%84%e6%8f%90/",
     "https://cn.dataconomy.com/2026/08/12/zoom-%e4%bf%ae%e5%a4%8d%e4%ba%86%e5%8f%af%e8%83%bd%e8%ae%a9%e6%94%bb%e5%87%bb%e8%80%85%e6%8e%a7%e5%88%b6%e8%ae%be%e5%a4%87%e7%9a%84%e5%b1%8f%e5%b9%95%e5%85%b1%e4%ba%ab%e7%bc%ba%e9%99%b7/",
     "https://cn.dataconomy.com/2026/08/12/google-gemini-%e6%af%8f%e6%9c%88%e7%94%a8%e6%88%b7%e6%95%b0%e8%be%be%e5%88%b0-10-%e4%ba%bf/",
     "https://cn.dataconomy.com/2026/08/12/spotify-%e5%b0%86%e4%b8%ba%e5%81%87%e8%89%ba%e4%ba%ba%e8%b4%b4%e4%b8%8a-ai-persona-%e5%be%bd%e7%ab%a0/",
@@ -190,16 +200,6 @@
     "https://cn.dataconomy.com/2026/07/10/meta-%e6%8e%a8%e5%87%ba%e7%94%a8%e4%ba%8e%e4%bb%a3%e7%90%86-ai-%e7%bc%96%e7%a0%81%e7%9a%84-muse-spark-1-1/",
     "https://cn.dataconomy.com/2026/07/10/spacexai-%e6%8e%a8%e5%87%ba%e6%96%b0%e6%97%97%e8%88%b0-ai-%e6%a8%a1%e5%9e%8b-grok-4-5/",
     "https://cn.dataconomy.com/2026/07/10/claude-%e4%bd%bf%e7%94%a8-reflect-%e4%bb%aa%e8%a1%a8%e6%9d%bf%e6%9d%a5%e8%b7%9f%e8%b8%aa-ai-%e4%bd%bf%e7%94%a8%e6%83%85%e5%86%b5/",
-    "https://cn.dataconomy.com/2026/07/10/%e8%b0%b7%e6%ad%8c%e6%8e%a8%e5%87%ba%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e5%b9%bf%e5%91%8a%e8%bf%99%e4%b8%aa%e5%b9%bf%e5%91%8a%e6%98%af%e5%a6%82%e4%bd%95%e5%88%b6%e4%bd%9c%e7%9a%84/",
-    "https://cn.dataconomy.com/2026/07/09/%e5%bd%93%e7%94%a8%e6%88%b7%e7%9a%84%e5%b8%96%e5%ad%90%e6%94%b6%e5%88%b0%e7%a4%be%e5%8c%ba%e8%af%b4%e6%98%8e%e6%97%b6%e5%90%91-dm-%e7%94%a8%e6%88%b7%e5%8f%91%e9%80%81-x/",
-    "https://cn.dataconomy.com/2026/07/09/%e8%8b%b9%e6%9e%9c%e5%9c%a8%e6%ac%a7%e7%9b%9f%e6%b3%95%e9%99%a2%e5%85%b3%e4%ba%8e%e5%ba%94%e7%94%a8%e5%95%86%e5%ba%97%e7%9c%8b%e9%97%a8%e4%ba%ba%e5%9c%b0%e4%bd%8d%e7%9a%84%e8%af%89%e8%ae%bc%e4%b8%ad/",
-    "https://cn.dataconomy.com/2026/07/09/openai-%e6%8e%a8%e5%87%ba%e9%80%82%e7%94%a8%e4%ba%8e-chatgpt-%e7%9a%84-gpt-live-%e8%af%ad%e9%9f%b3%e6%a8%a1%e5%9e%8b/",
-    "https://cn.dataconomy.com/2026/07/09/%e4%b8%89%e6%98%9f-galaxy-z-flip-8-%e5%92%8c-z-fold-8-%e6%b8%b2%e6%9f%93%e5%9b%be%e6%b3%84%e9%9c%b2/",
-    "https://cn.dataconomy.com/2026/07/09/duckduckgo-%e6%b5%8f%e8%a7%88%e5%99%a8%e7%8e%b0%e5%9c%a8%e4%bc%9a%e9%98%bb%e6%ad%a2%e5%a4%a7%e5%a4%9a%e6%95%b0-youtube-%e8%a7%86%e9%a2%91%e5%b9%bf%e5%91%8a/",
-    "https://cn.dataconomy.com/2026/07/09/%e4%ba%ba%e7%b1%bb%e7%a0%94%e7%a9%b6%e5%bc%95%e5%85%a5-gram-%e6%9d%a5%e9%9a%94%e7%a6%bb%e5%8d%b1%e9%99%a9%e7%9a%84%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e7%9f%a5%e8%af%86/",
-    "https://cn.dataconomy.com/2026/07/09/%e6%b3%95%e5%ae%98%e6%89%b9%e5%87%86%e9%a9%ac%e6%96%af%e5%85%8b-150-%e4%b8%87%e7%be%8e%e5%85%83%e7%9a%84-sec-%e5%92%8c%e8%a7%a3%e5%8d%8f%e8%ae%ae%ef%bc%8c%e4%bd%86%e8%a1%a8%e8%be%be%e4%ba%86%e6%8b%85/",
-    "https://cn.dataconomy.com/2026/07/09/ai-%e9%a9%b1%e5%8a%a8%e7%9a%84%e5%86%85%e5%ad%98%e5%8d%b1%e6%9c%ba%e5%86%b2%e5%87%bb%e4%be%9b%e5%ba%94%e9%93%be-%e5%85%a8%e7%90%83-pc-%e5%87%ba%e8%b4%a7%e9%87%8f%e4%b8%8b%e9%99%8d-5/",
-    "https://cn.dataconomy.com/2026/07/09/%e8%b0%b7%e6%ad%8c%e5%9c%a8%e8%b0%b7%e6%ad%8c%e7%85%a7%e7%89%87%e4%b8%ad%e6%8e%a8%e5%87%ba%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e9%a9%b1%e5%8a%a8%e7%9a%84%e8%a7%86%e9%a2%91%e6%b7%b7%e9%9f%b3%e5%b7%a5/",
-    "https://cn.dataconomy.com/2026/07/09/%e6%8d%ae%e6%8a%a5%e9%81%93%ef%bc%8c%e4%ba%9a%e9%a9%ac%e9%80%8a%e6%ad%a3%e5%9c%a8%e6%89%93%e9%80%a0%e6%9b%b4%e5%85%b7%e4%bb%a3%e7%90%86%e6%80%a7%e7%9a%84-alexa/"
+    "https://cn.dataconomy.com/2026/07/10/%e8%b0%b7%e6%ad%8c%e6%8e%a8%e5%87%ba%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e5%b9%bf%e5%91%8a%e8%bf%99%e4%b8%aa%e5%b9%bf%e5%91%8a%e6%98%af%e5%a6%82%e4%bd%95%e5%88%b6%e4%bd%9c%e7%9a%84/"
   ]
 }
