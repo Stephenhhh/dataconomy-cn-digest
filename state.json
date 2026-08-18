@@ -1,6 +1,13 @@
 {
-  "last_run_utc": "2026-08-15T01:55:46Z",
+  "last_run_utc": "2026-08-18T01:57:41Z",
   "seen_ids": [
+    "https://cn.dataconomy.com/2026/08/17/chatgpt-%e7%9a%84%e6%96%b0-mac-%e5%8a%9f%e8%83%bd%e5%8f%af%e8%ae%b0%e5%bd%95%e7%82%b9%e5%87%bb%e5%92%8c%e5%87%bb%e9%94%ae/",
+    "https://cn.dataconomy.com/2026/08/17/stripe-%e4%bb%a5%e8%b6%85%e8%bf%87-70-%e4%ba%bf%e7%be%8e%e5%85%83%e6%94%b6%e8%b4%ad-openrouter/",
+    "https://cn.dataconomy.com/2026/08/17/%e5%a5%b3%e5%ad%90%e7%a7%b0-grok-%e8%a2%ab%e7%94%a8%e6%9d%a5%e4%b8%ba%e5%a5%b9%e5%88%b6%e4%bd%9c-7000-%e5%bc%a0%e5%81%87%e9%9c%b2%e9%aa%a8%e5%9b%be%e5%83%8f/",
+    "https://cn.dataconomy.com/2026/08/17/%e5%be%ae%e8%bd%af%e8%a7%a3%e9%87%8a%e5%a6%82%e4%bd%95%e5%8a%a0%e5%bf%abwindows-11%e5%90%af%e5%8a%a8%e9%80%9f%e5%ba%a6/",
+    "https://cn.dataconomy.com/2026/08/17/%e6%8d%ae%e6%8a%a5%e9%81%93%ef%bc%8c%e8%b0%b7%e6%ad%8c%e8%81%98%e8%af%b7-amd-%e8%bf%9b%e8%a1%8c%e7%ac%ac-10-%e4%bb%a3-tpu-%e9%a1%b9%e7%9b%ae/",
+    "https://cn.dataconomy.com/2026/08/17/%e4%b8%89%e6%98%9f%e6%88%90%e4%b8%ba%e3%80%8a%e7%8e%b0%e4%bb%a3%e6%88%98%e4%ba%89-4%e3%80%8b%e5%ae%98%e6%96%b9%e6%98%be%e7%a4%ba%e5%99%a8%e5%90%88%e4%bd%9c%e4%bc%99%e4%bc%b4/",
+    "https://cn.dataconomy.com/2026/08/17/%e8%b0%b7%e6%ad%8c%e5%9c%a8-gemini-%e4%b8%ad%e5%b0%86%e5%8f%af%e8%a7%81%e7%9a%84-ai-%e6%b0%b4%e5%8d%b0%e8%ae%be%e4%b8%ba%e5%8f%af%e9%80%89/",
     "https://cn.dataconomy.com/2026/08/14/x-%e5%b0%86%e5%9c%a8-github-%e4%b8%8a%e5%bc%80%e6%ba%90%e5%85%b6-for-you-%e7%ae%97%e6%b3%95/",
     "https://cn.dataconomy.com/2026/08/14/ibm-%e4%b8%8e-openai-%e5%90%88%e4%bd%9c%e6%89%a9%e5%a4%a7%e4%bc%81%e4%b8%9a%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e9%83%a8%e7%bd%b2/",
     "https://cn.dataconomy.com/2026/08/14/instagram-%e5%9c%a8%e4%bd%bf%e7%94%a8%e6%97%a7%e5%be%bd%e6%a0%87%e5%8d%81%e5%b9%b4%e5%90%8e%e6%8e%a8%e5%87%ba%e6%96%b0%e6%96%87%e5%ad%97%e6%a0%87%e8%ae%b0/",
@@ -193,13 +200,6 @@
     "https://cn.dataconomy.com/2026/07/13/%e3%80%8a%e5%85%8b%e5%8a%b3%e5%be%b7%e5%af%93%e8%a8%80-5%e3%80%8b%e5%85%8d%e8%b4%b9%e4%bd%bf%e7%94%a8%e6%9c%9f%e5%bb%b6%e9%95%bf%e8%87%b3-7-%e6%9c%88-19-%e6%97%a5/",
     "https://cn.dataconomy.com/2026/07/13/%e6%ac%a7%e7%9b%9f%e8%ae%a1%e5%88%92%e6%a0%b9%e6%8d%ae%e6%96%b0%e6%b3%95%e5%be%8b%e5%af%b9%e5%a4%a7%e5%9e%8b%e7%a7%91%e6%8a%80%e5%85%ac%e5%8f%b8%e5%ae%9e%e6%96%bd%e6%9b%b4%e4%b8%a5%e5%8e%89%e7%9a%84/",
     "https://cn.dataconomy.com/2026/07/13/%e4%b8%89%e6%98%9f-galaxy-z-trifold-2-%e5%8f%91%e5%b8%83%e5%8f%af%e8%83%bd%e4%bc%9a%e6%8e%a8%e8%bf%9f/",
-    "https://cn.dataconomy.com/2026/07/13/spacex-%e8%ae%a1%e5%88%92-7-%e6%9c%88-16-%e6%97%a5%e5%8f%91%e5%b0%84-starship-flight-13/",
-    "https://cn.dataconomy.com/2026/07/13/%e9%bb%84%e4%bb%81%e5%8b%8b%e8%a1%a8%e7%a4%ba%e8%8b%b1%e4%bc%9f%e8%be%be%e5%ad%a3%e5%ba%a6%e8%90%a5%e6%94%b6%e6%8e%a5%e8%bf%91-1000-%e4%ba%bf%e7%be%8e%e5%85%83/",
-    "https://cn.dataconomy.com/2026/07/13/%e5%be%ae%e8%bd%af%e8%a2%ab%e8%b4%a3%e4%bb%a4%e6%81%a2%e5%a4%8d%e6%9a%82%e5%81%9c%e7%9a%84-xbox-%e5%ba%93/",
-    "https://cn.dataconomy.com/2026/07/13/openai-%e6%9a%82%e6%97%b6%e5%8f%96%e6%b6%88-gpt-5-6-sol-%e4%bd%bf%e7%94%a8%e9%99%90%e5%88%b6/",
-    "https://cn.dataconomy.com/2026/07/10/%e5%b0%8f%e7%b1%b3-18-pro-%e5%b0%86%e4%ba%8e-9-%e6%9c%88%e9%a6%96%e5%8f%91%ef%bc%8c%e6%90%ad%e8%bd%bd-snapdragon-8-elite-gen-6-%e8%8a%af%e7%89%87/",
-    "https://cn.dataconomy.com/2026/07/10/meta-%e7%94%b3%e8%af%b7%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e6%83%85%e7%bb%aa%e7%9b%91%e6%b5%8b%e8%ae%be%e5%a4%87%e4%b8%93%e5%88%a9/",
-    "https://cn.dataconomy.com/2026/07/10/%e5%9f%83%e9%9a%86%c2%b7%e9%a9%ac%e6%96%af%e5%85%8b%e6%89%bf%e8%ae%a4-anthropic-%e5%bc%95%e9%a2%86%e4%ba%ba%e5%b7%a5%e6%99%ba%e8%83%bd%e8%a1%8c%e4%b8%9a/",
-    "https://cn.dataconomy.com/2026/07/10/meta-%e6%8e%a8%e5%87%ba%e7%94%a8%e4%ba%8e%e4%bb%a3%e7%90%86-ai-%e7%bc%96%e7%a0%81%e7%9a%84-muse-spark-1-1/"
+    "https://cn.dataconomy.com/2026/07/13/spacex-%e8%ae%a1%e5%88%92-7-%e6%9c%88-16-%e6%97%a5%e5%8f%91%e5%b0%84-starship-flight-13/"
   ]
 }
